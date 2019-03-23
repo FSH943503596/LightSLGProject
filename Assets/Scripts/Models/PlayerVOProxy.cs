@@ -8,6 +8,7 @@
 */
 
 using PureMVC.Patterns;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -26,7 +27,6 @@ public class PlayerVOProxy : Proxy
     public PlayerVOProxy() : base(NAME, new List<PlayerVO>())
     {        
     }
-
     /// <summary>
     /// 创建一个玩家
     /// </summary>
@@ -39,14 +39,17 @@ public class PlayerVOProxy : Proxy
 
         _Players.Add(player);
 
+        player.gold = GlobalSetting.PLAYER_ORIGINAL_GOLD;
+        player.grain = GlobalSetting.PLAYER_ORIGINAL_GRAIN;
+
+        if(player.IsUser) SendNotification(GlobalSetting.Msg_UsersPlayerCreated, player);
+
         return player;
     }
-
     public void ClearPlayers()
     {
         _Players.Clear();
     }
-
     /// <summary>
     /// 获取玩家的主基地列表
     /// </summary>
@@ -55,12 +58,11 @@ public class PlayerVOProxy : Proxy
     {
         for (int i = 0; i < _Players.Count; i++)
         {
-            if (_Players[i].Id == 1) return _Players[i].MainBases;
+            if (_Players[i].Id == 1) return _Players[i].mainBases;
         }
 
         return null;
     }
-
     /// <summary>
     /// 判断建筑是否能够建造
     /// </summary>
@@ -70,7 +72,7 @@ public class PlayerVOProxy : Proxy
     public bool IsCanConstructionUserBuilding(int playerID, IBuildingVO building)
     {
         PlayerVO player = _Players[playerID];
-        IList<MainBaseVO> mainbases = player.MainBases;
+        IList<MainBaseVO> mainbases = player.mainBases;
         List<IBuildingVO> buildings = null;
         Vector3Int downLeft;
         Vector3Int middle;
@@ -108,7 +110,6 @@ public class PlayerVOProxy : Proxy
 
         return false;
     }
-
     /// <summary>
     /// 获取玩家数据
     /// </summary>
@@ -117,7 +118,6 @@ public class PlayerVOProxy : Proxy
     {
         return _Players[0];
     }
-
     /// <summary>
     /// 获取建筑属于玩家的哪个基地，不属于，返回NULL
     /// </summary>
@@ -128,7 +128,7 @@ public class PlayerVOProxy : Proxy
         if (building.buildingType == E_Building.MainBase) return building as MainBaseVO;
 
         PlayerVO player = GetUserVO();
-        IList<MainBaseVO> mainbases = player.MainBases;
+        IList<MainBaseVO> mainbases = player.mainBases;
         List<IBuildingVO> buildings = null;
         Vector3Int downLeft;
         Vector3Int upRight;
@@ -163,6 +163,22 @@ public class PlayerVOProxy : Proxy
         }
 
         return null;
+    }
+    public void VisitAllPlayerMainBase(PlayerVO vo, Action<MainBaseVO> visitor)
+    { 
+        if(vo != null && visitor != null)
+        {
+            var enumerator = vo.mainBases.GetEnumerator();
+            while(enumerator.MoveNext())
+            {
+                visitor(enumerator.Current);
+            }
+        }
+    }
+
+    public void VisitAllUserPlayerMainbase(Action<MainBaseVO> visitor)
+    {
+        VisitAllPlayerMainBase(GetUserVO(), visitor);
     }
 }
 

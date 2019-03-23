@@ -10,6 +10,7 @@ TagManager:
   - _TagBattleSceneCamera
   - _TagBuildingParent
   - _TagSoldiersParent
+  - _TagHudParent
   layers:
   - Default
   - TransparentFX

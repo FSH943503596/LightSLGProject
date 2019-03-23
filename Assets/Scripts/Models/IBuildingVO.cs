@@ -25,7 +25,6 @@ public abstract class IBuildingVO
     public E_Building buildingType { get => _BuildingType; set => _BuildingType = value; }
     public int rotateValue { get => _RotateValue; }
     public Vector3 postion { get => _Postion; set => _Postion = value; }
-
     public void Rotate()
     {
         if (_RotateValue == 0)

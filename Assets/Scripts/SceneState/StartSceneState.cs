@@ -9,6 +9,7 @@
 */
 
 using PureMVC.Interfaces;
+using StaticData;
 using SUIFW;
 using System;
 
@@ -20,6 +21,8 @@ public class StartSceneState : ISceneState
     {
         //加载资源配置
         ResourcesMgr.Instance.LoadConfigs();
+        //加载配置信息
+        StaticDataMgr.mInstance.LoadData();
         //启动MVC框架
         GameFacade gameFacade = GameFacade.Instance as GameFacade;
         gameFacade.sceneStateController = StateController;

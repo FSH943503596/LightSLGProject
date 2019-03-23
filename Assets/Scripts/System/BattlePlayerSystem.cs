@@ -8,6 +8,7 @@
 */
 
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class BattlePlayerSystem : IBattleSystem<BattleManager>
@@ -17,6 +18,8 @@ public class BattlePlayerSystem : IBattleSystem<BattleManager>
     private BattleMapSystem _MapSystem;
     private PlayerVO _UserPlayer;
     private Vector3 _UserMainBasePosition;
+    private Dictionary<MainBaseVO, bool> _UsersMainBasesIsCanLevelUP = new Dictionary<MainBaseVO, bool>();
+    private bool _isMainbaseCanLevelStateChange = false;
     public BattlePlayerSystem(IBattleManager mgr) : base(mgr)
     {
         _BuildingSystem = battleManager.buildingSystem;
@@ -31,7 +34,7 @@ public class BattlePlayerSystem : IBattleSystem<BattleManager>
         //创建玩家
         _UserPlayer = _PlayerProxy.CreatePlayer("我是玩家", 1);
         CreatePlayerFirstMainBase(_UserPlayer, 0.125f, 0.375f, 0.125f, 0.375f);
-        _UserMainBasePosition = _UserPlayer.MainBases[0].postion;
+        _UserMainBasePosition = _UserPlayer.mainBases[0].postion;
 
         //创建敌军
         PlayerVO enemy = _PlayerProxy.CreatePlayer("我是敌人", 2);
@@ -45,7 +48,6 @@ public class BattlePlayerSystem : IBattleSystem<BattleManager>
             CreatePlayerFirstMainBase(neutralPlayer, 0.125f + i * 0.5f, 0.375f + i * 0.5f, 0.625f - i * 0.5f, 0.875f - i * 0.5f);
         }
     }
-
     private void CreatePlayerFirstMainBase(PlayerVO enemy, float startXPrec, float endXPrec, float startZPrec, float endZPrec)
     {
         //创建建筑数据对象
@@ -58,6 +60,29 @@ public class BattlePlayerSystem : IBattleSystem<BattleManager>
         _MapSystem.ChangeMapTileInfos(tempMainBaseVO.startTilePositonInMap, GlobalSetting.MAINBASE_ORIGINAL_TILES);
         //显示建筑
         _BuildingSystem.CreateMainBase(tempMainBaseVO);
+    }
+    public override void Update()
+    {
+        _isMainbaseCanLevelStateChange = false;
+        _PlayerProxy.VisitAllUserPlayerMainbase(CheckLevelUp);
+        if (_isMainbaseCanLevelStateChange) facade.SendNotification(GlobalSetting.Msg_ChangeMainBaseLevelUpState, _UsersMainBasesIsCanLevelUP);
+    }
+    private void CheckLevelUp(MainBaseVO obj)
+    {
+        bool returnValue = _BuildingSystem.IsMainBaseCanLevelUp(obj);
+
+        returnValue = returnValue && _MapSystem.IsCanOccupedRingArea(obj.tilePositon, obj.radius, _BuildingSystem.GetNextLevelRadius(obj));
+
+        if (_UsersMainBasesIsCanLevelUP.ContainsKey(obj))
+        {
+            _isMainbaseCanLevelStateChange = _isMainbaseCanLevelStateChange || !_UsersMainBasesIsCanLevelUP[obj].Equals(returnValue);
+            _UsersMainBasesIsCanLevelUP[obj] = returnValue;           
+        }
+        else
+        {
+            _UsersMainBasesIsCanLevelUP.Add(obj, returnValue);
+            _isMainbaseCanLevelStateChange = _isMainbaseCanLevelStateChange || returnValue;
+        }
     }
 }
 

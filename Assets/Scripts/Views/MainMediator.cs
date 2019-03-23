@@ -9,18 +9,37 @@
 
 using PureMVC.Interfaces;
 using PureMVC.Patterns;
+using System;
 using System.Collections.Generic;
 
 public class MainMediator : Mediator
 {
     new public const string NAME = "MainMediator";
 
+    private ushort _MapSize;
+
     public void InitMainMediator(MainUIForm mainUIForm)
     {
         if(mainUIForm)
         {
+            _MapSize = GlobalSetting.MAP_SMALL_LENGTH;
             mainUIForm.btnStartBattle.onClick.AddListener(Click_StartBattle);
+            mainUIForm.BtnReturnLogin.onClick.AddListener(Click_ReturnLogin);
+            mainUIForm.TglSmall.onValueChanged.AddListener(p => { if (p) SelectMapSize(GlobalSetting.MAP_SMALL_LENGTH); });
+            mainUIForm.TglNormal.onValueChanged.AddListener(p => { if (p) SelectMapSize(GlobalSetting.MAP_NORMAL_LENGTH); });
+            mainUIForm.TglBig.onValueChanged.AddListener(p => { if (p) SelectMapSize(GlobalSetting.MAP_BIG_LENGTH); });
+            mainUIForm.TglHuge.onValueChanged.AddListener(p => { if (p) SelectMapSize(GlobalSetting.MAP_HUGE_LENGTH); });
         }
+    }
+
+    private void SelectMapSize(ushort size)
+    {
+        _MapSize = size;
+    }
+
+    private void Click_ReturnLogin()
+    {
+        SendNotification(GlobalSetting.Cmd_ReturnLogin);
     }
 
     public override IList<string> ListNotificationInterests()
@@ -48,7 +67,9 @@ public class MainMediator : Mediator
     }
     private void Click_StartBattle()
     {
-        SendNotification(GlobalSetting.Cmd_StartBattle);
+        var mapsize = OneMsgParamsPool<ushort>.Instance.Pop();
+        mapsize.InitParams(_MapSize); 
+        SendNotification(GlobalSetting.Cmd_StartBattle, mapsize);
     }
 }
 

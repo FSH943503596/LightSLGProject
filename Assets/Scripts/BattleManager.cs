@@ -19,9 +19,15 @@ public class BattleManager : IBattleManager
     public BattlePlayerSystem playerSystem;
     public SLGInputSystem inputSystem;
     public BattleTroopSystem troopSystem;
+
+    private int _MapWidth;
+    private int _MapHeight;
+
     private BattleManager() { }
 
-    public bool IsBattleOver { get; set; }
+    public bool isBattleOver { get; set; }
+    public int mapWidth { get => _MapWidth;}
+    public int mapHeight { get => _MapHeight;}
 
     public void Initinal()
     {
@@ -43,13 +49,15 @@ public class BattleManager : IBattleManager
         //调整相机位置到玩家位置
         mapSystem.SetCameraPosition(playerSystem.UserMainBasePosition);
         //生成地图
-        mapSystem.PrintMap();       
+        mapSystem.PrintMap();
     }
 
     private void ShowBattleUI()
     {
         //显示建造面板
         UIManager.Instance.ShowUIForms(GlobalSetting.UI_ConstructionUIForm);
+        //显示玩家战斗信息面板
+        UIManager.Instance.ShowUIForms(GlobalSetting.UI_PlayerBattleInfoUIForm);
 
         //初始化面板
         UIManager.Instance.ShowUIForms(GlobalSetting.UI_MobilizeTroopsInfoUIForm);
@@ -67,6 +75,8 @@ public class BattleManager : IBattleManager
         inputSystem.Update();
         mapSystem.Update();
         troopSystem.Update();
+        buildingSystem.Update();
+        playerSystem.Update();
     }
 
     public void ShowConstraction(Transform builidTF)
@@ -78,5 +88,11 @@ public class BattleManager : IBattleManager
     {
         inputSystem.LongTapItem = null;
         inputSystem.DragItem = null;
+    }
+
+    public void SetMapRect(int width, int height)
+    {
+        _MapWidth = width;
+        _MapHeight = height;
     }
 }

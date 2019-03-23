@@ -45,7 +45,7 @@ public class ConfirmConstructionCommand : SimpleCommand
                             mapVOProxy.SetBuildingInfo(true, building.tilePositon, building.rect);
                             //更新占领信息
                             mapVOProxy.SetOccupiedInfo(true, building.tilePositon, mainBaseVO.radius);
-                            buildingProxy.CreateBuilding(mainBaseVO, mainBaseVO, userVo.Id);
+                            buildingProxy.CreateBuilding(mainBaseVO, mainBaseVO, userVo);
 
                             mainBaseVO.SetOwer(userVo);
                         }
@@ -61,7 +61,7 @@ public class ConfirmConstructionCommand : SimpleCommand
                         mainBase.AddBuilding(building);
                         //更新地图建筑信息
                         mapVOProxy.SetBuildingInfo(true, building.tilePositon, building.rect);
-                        buildingProxy.CreateBuilding(building, mainBase, userVo.Id);
+                        buildingProxy.CreateBuilding(building, mainBase, userVo);
                     }               
                     break;
                 default:

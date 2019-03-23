@@ -15,7 +15,17 @@ using UnityEngine.UI;
 public class MainUIForm : BaseUIForm
 {
     [SerializeField] private Button _BtnStartBattle;
+    [SerializeField] private Button _BtnReturnLogin;
+    [SerializeField] private Toggle _TglSmall;
+    [SerializeField] private Toggle _TglNormal;
+    [SerializeField] private Toggle _TglBig;
+    [SerializeField] private Toggle _TglHuge;
 
-    public Button btnStartBattle { get => _BtnStartBattle;}
+    public Button btnStartBattle => _BtnStartBattle;
+    public Button BtnReturnLogin => _BtnReturnLogin;
+    public Toggle TglSmall => _TglSmall;
+    public Toggle TglNormal => _TglNormal;
+    public Toggle TglBig => _TglBig;
+    public Toggle TglHuge => _TglHuge;
 }
 

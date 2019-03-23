@@ -16,10 +16,14 @@ public class StartBattleCommand : SimpleCommand
     public override void Execute(INotification notification)
     {
         base.Execute(notification);
-        GameFacade gameFacade = Facade as GameFacade;
-        //各种战斗判断
-
-        gameFacade.sceneStateController.SetStateAsync(new BattleSceneState(gameFacade.sceneStateController, BattleManager.Instance), "Battle");
+        OneMsgParams<ushort> mapsize = notification.Body as OneMsgParams<ushort>;
+        if (mapsize != null)
+        {
+            GameFacade gameFacade = Facade as GameFacade;
+            //各种战斗判断
+            BattleManager.Instance.SetMapRect(mapsize.parameter, mapsize.parameter);
+            gameFacade.sceneStateController.SetStateAsync(new BattleSceneState(gameFacade.sceneStateController, BattleManager.Instance), "Battle");
+        } 
     }
 }
 

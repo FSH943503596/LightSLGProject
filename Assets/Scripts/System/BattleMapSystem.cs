@@ -30,10 +30,12 @@ public class BattleMapSystem : IBattleSystem<BattleManager>
     public bool[] walkable;
     public Transform TileParent;
 
-    //测试数据
-    public float[] weights;
     public int width;
     public int height;
+
+    //测试数据
+    public float[] weights;
+    
     public float xOriMax;
     public float yOriMax;
     public float scale = 5f;
@@ -49,6 +51,9 @@ public class BattleMapSystem : IBattleSystem<BattleManager>
 
     public BattleMapSystem(IBattleManager manager) : base(manager)
     {
+        width = battleManager.mapWidth;
+        height = battleManager.mapHeight;
+
         yDelta = new Vector3Int(-1, 0, 1);
         xDelta = new Vector3Int(1, 0, 1);
 
@@ -56,8 +61,7 @@ public class BattleMapSystem : IBattleSystem<BattleManager>
         tileNames = new string[] { "Hill", "Gobi", "Plain", "River" };
         weights = new float[] { 100, 100, 100, 100 };
         walkable = new bool[] { false, true, true, true };
-        width = 100;
-        height = 100;
+        
         xOriMax = 2;
         yOriMax = 2;
         scale = 5f;
@@ -194,6 +198,11 @@ public class BattleMapSystem : IBattleSystem<BattleManager>
         targetPos = mapParent.worldToLocalMatrix * targetPos;
 
         return new Vector3Int((int)targetPos.x, 0, (int)targetPos.z);
+    }
+
+    public bool IsCanOccupedRingArea(Vector3Int position, int internalRadius, int outerRadius)
+    {
+        return _MapProxy.IsCanOccupedRingArea(position, internalRadius, outerRadius);
     }
 
     #region 算法初始源码

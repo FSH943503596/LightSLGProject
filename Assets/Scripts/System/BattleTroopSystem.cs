@@ -29,14 +29,12 @@ public class BattleTroopSystem : IBattleSystem<BattleManager>
     public override void Update()
     {
         int total;
-        Troop troop ;
-        GameObject soldier;
         AStarPathFindingAgent agent;
         System.Random random = new System.Random();
         //出兵
         for (int i = 0; i < troops.Count; i++)
         {
-            troop = troops[i];
+            Troop troop = troops[i];
             total = troop.start.soldierNum - CreateCountPerFrame < 0 ? troop.start.soldierNum : CreateCountPerFrame;
             total = troop.amount > total ? total : troop.amount;
             troop.start.soldierNum -= total;
@@ -46,14 +44,17 @@ public class BattleTroopSystem : IBattleSystem<BattleManager>
             for (int j = 0; j < total; j++)
             {
                 //创建指定数量的兵
-                soldier = PoolManager.Instance.GetObject("Soldier", LoadAssetType.Normal, _SoldierParent);
+                GameObject soldier = PoolManager.Instance.GetObject("Soldier", LoadAssetType.Normal, _SoldierParent);
                 soldier.transform.position = troop.start.postion + Vector3.left * random.Next(-100,100) / 200f + Vector3.forward * random.Next(-100,100) / 200f;
                 agent = soldier.GetComponent<AStarPathFindingAgent>();
                 agent.SetTarget(troop.end.postion);
+                agent.StopDistance = troop.end.radius + 0.5f;
                 agent.AddCompleteListener(() =>
                 {
-
-
+                    //TODO 士兵到达处理
+                    troop.end.ReceiveSoldier(troop.starter, UnityEngine.Time.time);
+                    PoolManager.Instance.HideObjet(soldier);
+                    //TODO 处理占领，失败，胜利
                 });
             }    
         }
@@ -86,6 +87,7 @@ public class BattleTroopSystem : IBattleSystem<BattleManager>
             }
 
             troop.start = start;
+            troop.starter = start.ower;
             troop.end = end;
             troop.amount = amount;
 
@@ -101,6 +103,7 @@ public class BattleTroopSystem : IBattleSystem<BattleManager>
     private struct Troop
     {
         public MainBaseVO start;
+        public PlayerVO starter;
         public MainBaseVO end;
         public int amount;
     }

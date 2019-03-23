@@ -27,7 +27,7 @@ public class BattleSceneState : ISceneState
     {
         gameBattleManager.Update();
 
-        if (gameBattleManager.IsBattleOver)
+        if (gameBattleManager.isBattleOver)
         {
             StateController.SetStateAsync(new MainSceneState(StateController), "Main");
         }

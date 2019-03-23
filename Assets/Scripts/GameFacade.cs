@@ -55,6 +55,7 @@ public class GameFacade : Facade
         RegisterMediator(new MainMediator());
         RegisterMediator(new ConstructionMediator());
         RegisterMediator(new MobilizeTroopsMediator());
+        RegisterMediator(new PlayerBattleInfoMediator());
     }
 
     protected override void InitializeController()
@@ -64,6 +65,7 @@ public class GameFacade : Facade
         RegisterCommand(GlobalSetting.UI_LoginUIForm, typeof(LoginUIFormCommand));
         RegisterCommand(GlobalSetting.UI_MainUIForm, typeof(MainUIFormCommand));
         RegisterCommand(GlobalSetting.UI_MobilizeTroopsInfoUIForm, typeof(MobilizeTroopsInfoUIFormCommand));
+        RegisterCommand(GlobalSetting.UI_PlayerBattleInfoUIForm, typeof(PlayerBattleInfoUIFormCommand));
 
         RegisterCommand(GlobalSetting.Cmd_ExitGame, typeof(ExitGameCommand));
         RegisterCommand(GlobalSetting.Cmd_LoginGame, typeof(LoginCommand));
@@ -74,6 +76,8 @@ public class GameFacade : Facade
         RegisterCommand(GlobalSetting.Cmd_PickMainBase, typeof(PickMainBaseCommand));
         RegisterCommand(GlobalSetting.Cmd_MoveTroops, typeof(MoveTroopsCommand));
         RegisterCommand(GlobalSetting.Cmd_MoveCamera, typeof(MoveCameraCommand));
+        RegisterCommand(GlobalSetting.Cmd_ReturnLogin, typeof(ReturnLoginCommand));
+        RegisterCommand(GlobalSetting.Cmd_UpdateMainBase, typeof(UpdateMainBaseCommand));
     }  
 }
 

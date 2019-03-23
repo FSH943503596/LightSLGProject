@@ -27,12 +27,14 @@ namespace StaticData
         }
 
         // *************				data	 	***************
-		public Dictionary<ushort, AbilityData> mAbilityDataMap = new Dictionary<ushort, AbilityData>(); //Ability Data
+		public Dictionary<ushort, GlobalSettingData> mGlobalSettingDataMap = new Dictionary<ushort, GlobalSettingData>(); //GlobalSetting Data
+		public Dictionary<ushort, MainBaseLevelData> mMainBaseLevelDataMap = new Dictionary<ushort, MainBaseLevelData>(); //MainBaseLevel Data
 
         //加载数据
         public void LoadData()
         {
-			LoadDataBinWorker<AbilityData>("Ability.bytes", mAbilityDataMap); //Ability Data
+			LoadDataBinWorker<GlobalSettingData>("GlobalSetting.bytes", mGlobalSettingDataMap); //GlobalSetting Data
+			LoadDataBinWorker<MainBaseLevelData>("MainBaseLevel.bytes", mMainBaseLevelDataMap); //MainBaseLevel Data
 
 						
 			//定义如型： void SheetNameDataProcess(ClassType data) 的函数, 会被自动调用
@@ -87,7 +89,7 @@ namespace StaticData
     //数据结构基类
     public abstract class BaseDataObject
     {
-        public ushort mID = 0; // ID
+        public ushort mID = 0; // mID
         public abstract void ReadFromStream(BinaryReader br);
     }
     

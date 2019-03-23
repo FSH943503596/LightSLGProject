@@ -8,6 +8,7 @@
 */
 
 using System;
+using UnityEngine;
 
 public class BattleBuildingSystem : IBattleSystem<BattleManager>
 {
@@ -21,7 +22,30 @@ public class BattleBuildingSystem : IBattleSystem<BattleManager>
 
     public void CreateMainBase(MainBaseVO vo)
     {
-        _BuildingVOProxy.CreateBuilding(vo, vo, vo.ower.Id);
+        _BuildingVOProxy.CreateBuilding(vo, vo, vo.ower);
+    }
+
+    public override void Update()
+    {
+        _BuildingVOProxy.VisitMainBases(UpdateMainbaseVoHandler);
+
+        facade.SendNotification(GlobalSetting.Msg_SetUsersPlayerBattleInfoDirty);
+    }
+
+    private void UpdateMainbaseVoHandler(MainBaseVO vo)
+    {
+        //主城数据自动更新
+        vo.Update(Time.time);
+    }
+
+    public bool IsMainBaseCanLevelUp(MainBaseVO vo)
+    {
+        return _BuildingVOProxy.IsCanLevelUp(vo);
+    }
+
+    public int GetNextLevelRadius(MainBaseVO vO)
+    {
+        return _BuildingVOProxy.GetMainbaseNextLevelRadius(vO);
     }
 }
 

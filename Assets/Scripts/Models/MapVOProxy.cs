@@ -123,7 +123,6 @@ public class MapVOProxy : Proxy
 
         return new Vector3Int((int)targetPos.x, 0, (int)targetPos.z);
     }
-
     public bool IsCanOccupedArea(Vector3Int position, int radius)
     {
         int startX = position.x;
@@ -138,6 +137,30 @@ public class MapVOProxy : Proxy
                 if (startY + j < 0) return false;
 
                 if (Math.Abs(i) + Math.Abs(j) < radius)
+                {
+                    if (data.IsOccupied(startX + i, startY + j)) return false;
+                }
+            }
+        }
+
+        return true;
+    }
+    public bool IsCanOccupedRingArea(Vector3Int position, int internalRadius, int outerRadius)
+    {
+        int startX = position.x;
+        int startY = position.z;
+        int length = 0;
+        MapVO data = MapData;
+
+        for (int i = -outerRadius + 1; i < outerRadius; i++)
+        {
+            if (startX + i < 0) return false;
+            for (int j = -outerRadius + 1; j < outerRadius; j++)
+            {
+                if (startY + j < 0) return false;
+
+                length = Math.Abs(i) + Math.Abs(j);
+                if (length < outerRadius &&  length >= internalRadius)
                 {
                     if (data.IsOccupied(startX + i, startY + j)) return false;
                 }

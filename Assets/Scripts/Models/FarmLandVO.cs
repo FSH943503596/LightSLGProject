@@ -11,10 +11,15 @@ using System;
 
 public class FarmLandVO : IBuildingVO
 {
+    private float _GrainOutputNum = 1;
+    private int _GrainLimit = 1000;
     public FarmLandVO()
     {
         prefabName = "FarmLand";
         _BuildingType = E_Building.FarmLand;
     }
+
+    public float grainOutputNum { get => _GrainOutputNum; set => _GrainOutputNum = value; }
+    public int grainLimit { get => _GrainLimit; set => _GrainLimit = value; }
 }
 

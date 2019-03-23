@@ -13,7 +13,10 @@
 "Value":"UI\\MainUIForm"},
 
 {"Key":"MobilizeTroopsInfoUIForm",
-"Value":"UI\\MobilizeTroopsInfoUIForm"}
+"Value":"UI\\MobilizeTroopsInfoUIForm"},
+
+{"Key":"PlayerBattleInfoUIForm",
+"Value":"UI\\PlayerBattleInfoUIForm"}
 
 ]
 }

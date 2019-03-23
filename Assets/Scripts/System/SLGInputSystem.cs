@@ -19,6 +19,7 @@ public class SLGInputSystem :IBattleSystem<BattleManager>
     private Vector3Int lastDragPosition;
 
     private int groundLayerMask;
+    private Action<float> ChangeViewRect;
 
     public Transform LongTapItem { get => longTapItem; set => longTapItem = value; }
     public Transform DragItem { get => dragItem; set => dragItem = value; }
@@ -27,6 +28,9 @@ public class SLGInputSystem :IBattleSystem<BattleManager>
     {
         camera = GameObject.FindGameObjectWithTag(GlobalSetting.TAG_BATTLE_SCENE_CAMERA_NAME).GetComponent<Camera>();
         cameraRoot = camera.transform.parent;
+        if (camera.orthographic) ChangeViewRect = OrthographicCameraChangeViewRect;
+        else ChangeViewRect = PerspectiveCameraChangeViewRect;
+
 
         constructionMediator = facade.RetrieveMediator(ConstructionMediator.NAME) as ConstructionMediator;
         mapProxy = facade.RetrieveProxy(MapVOProxy.NAME) as MapVOProxy;
@@ -39,11 +43,11 @@ public class SLGInputSystem :IBattleSystem<BattleManager>
 #if UNITY_EDITOR || UNITY_STANDALONE
         if (Input.GetKeyDown(KeyCode.UpArrow))
         {
-            camera.fieldOfView += 1000 * Time.deltaTime;
+            ChangeViewRect(300 * Time.deltaTime);
         }
         else if (Input.GetKeyDown(KeyCode.DownArrow))
         {
-            camera.fieldOfView -= 1000 * Time.deltaTime;
+            ChangeViewRect(- 300 * Time.deltaTime);
         }
         else if (Input.GetMouseButtonDown(1))
         {
@@ -123,7 +127,8 @@ public class SLGInputSystem :IBattleSystem<BattleManager>
 
         if (current.type == EasyTouch.EvtType.On_Pinch)
         {
-            camera.fieldOfView += current.deltaPinch * 10 * Time.deltaTime;
+            
+            ChangeViewRect(current.deltaPinch * 10 * Time.deltaTime);
         }
     }
 
@@ -146,5 +151,15 @@ public class SLGInputSystem :IBattleSystem<BattleManager>
         }
 
         return result;
+    }
+
+    private void PerspectiveCameraChangeViewRect(float vo)
+    {
+        camera.fieldOfView += vo;
+    }
+
+    private void OrthographicCameraChangeViewRect(float vo)
+    {
+        camera.orthographicSize += vo;
     }
 }

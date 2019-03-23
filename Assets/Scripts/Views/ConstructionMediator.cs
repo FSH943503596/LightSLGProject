@@ -24,16 +24,21 @@ public class ConstructionMediator : Mediator
     private bool _IsShowBuildingList = true;
 
     private Transform _BuildingParnet;
+    private Transform _HUDParent;
     private MapVOProxy _MapProxy;
     private PlayerVOProxy _UserProxy;
+    private BuildingVOProxy _BuildingProxy;
     private IBuildingVO _Building;
     private Transform _BuildingTF;
     private HUDConstruction _CurrentIndicator;
     private Func<bool> _IsCanConfirmFunc;
     private bool isCreating = false;
+    private PlayerVO _UserPlayerVO;
 
     private Dictionary<GameObject, IBuildingVO> _GameObjectToVO = new Dictionary<GameObject, IBuildingVO>();
     private Dictionary<GameObject, MainBaseVO> _GameOjectToMainbaseVO = new Dictionary<GameObject, MainBaseVO>();
+    private Dictionary<MainBaseVO, MainBase> _MainBaseVOToMainBase = new Dictionary<MainBaseVO, MainBase>();
+    private Dictionary<GameObject, MainBaseVO> _UpLevelGOToMainbaseVO = new Dictionary<GameObject, MainBaseVO>();
 
     private ConstructionUIForm uiForm
     {
@@ -51,7 +56,9 @@ public class ConstructionMediator : Mediator
         return new List<string>()
         {
             GlobalSetting.Msg_InitConstructionMediator,
-            GlobalSetting.Msg_BuildBuilding
+            GlobalSetting.Msg_BuildBuilding,
+            GlobalSetting.Msg_ChangeMainBaseLevelUpState,
+            GlobalSetting.Msg_UpdateMainBase
         };
     }
 
@@ -59,6 +66,13 @@ public class ConstructionMediator : Mediator
     {
         switch (notification.Name)
         {
+            case GlobalSetting.Msg_ChangeMainBaseLevelUpState:
+                var mainbaseLevelUpState = notification.Body as Dictionary<MainBaseVO, bool>;
+                if (mainbaseLevelUpState != null)
+                {
+                    ChangeMainbaseLevelUpState(mainbaseLevelUpState);
+                }
+                break;
             case GlobalSetting.Msg_InitConstructionMediator:
                 ConstructionUIForm constructionUIForm = notification.Body as ConstructionUIForm;
                 if (constructionUIForm)
@@ -73,10 +87,41 @@ public class ConstructionMediator : Mediator
                     BuildBuilding(buildingVO);
                 }
                 break;
+            case GlobalSetting.Msg_UpdateMainBase:
+                var mainBase = notification.Body as MainBaseVO;
+                if (mainBase != null && _MainBaseVOToMainBase.ContainsKey(mainBase))
+                {
+                    _MainBaseVOToMainBase[mainBase].UpdateArea();
+                }
+                break;
             default:
                 break;
         }
     }
+
+    private void ChangeMainbaseLevelUpState(Dictionary<MainBaseVO, bool> mainbaseLevelUpState)
+    {
+        PoolManager.Instance.HideAllObject("HUD_MainBaseUpLevel");
+        var enumberator = mainbaseLevelUpState.GetEnumerator();
+        Transform hudTF;
+        while (enumberator.MoveNext())
+        {
+            if (enumberator.Current.Value)
+            {
+                hudTF = PoolManager.Instance.GetObject("HUD_MainBaseUpLevel", LoadAssetType.Normal, _HUDParent).transform;
+                hudTF.position = enumberator.Current.Key.postion;
+                if (_UpLevelGOToMainbaseVO.ContainsKey(hudTF.gameObject))
+                {
+                    _UpLevelGOToMainbaseVO[hudTF.gameObject] = enumberator.Current.Key;
+                }
+                else
+                {
+                    _UpLevelGOToMainbaseVO.Add(hudTF.gameObject, enumberator.Current.Key);
+                }
+            }
+        }
+    }
+
     public void InitConstructionMediator(ConstructionUIForm baseUIForm)
     {
         base.ViewComponent = baseUIForm;
@@ -94,10 +139,12 @@ public class ConstructionMediator : Mediator
         uiForm.btnTurn.onClick.AddListener(RotateBuilding);
 
         _BuildingParnet = GameObject.FindGameObjectWithTag(GlobalSetting.TAG_BUILDING_PARENT_NAME).transform;
-
+        _HUDParent = GameObject.FindGameObjectWithTag(GlobalSetting.TAG_HUD_PARENT_NAME).transform;
         _MapProxy = Facade.RetrieveProxy(MapVOProxy.NAME) as MapVOProxy;
 
         _UserProxy = Facade.RetrieveProxy(PlayerVOProxy.NAME) as PlayerVOProxy;
+
+        _BuildingProxy = Facade.RetrieveProxy(BuildingVOProxy.NAME) as BuildingVOProxy;
 
         CreateBuildingIndicator();
     }
@@ -249,13 +296,20 @@ public class ConstructionMediator : Mediator
     /// <param name="selectedTF"></param>
     public void PickBuilding(GameObject selectedTF)
     {
-        if (selectedTF && selectedTF.transform.parent && _GameObjectToVO.ContainsKey(selectedTF.transform.parent.gameObject))
+        if (selectedTF && selectedTF.transform.parent)
         {
-            IBuildingVO pickItem = _GameObjectToVO[selectedTF.transform.parent.gameObject];
-            if (pickItem.buildingType == E_Building.MainBase)
+            if (_UpLevelGOToMainbaseVO.ContainsKey(selectedTF.transform.parent.gameObject))
             {
-                SendNotification(GlobalSetting.Cmd_PickMainBase, pickItem);
+                SendNotification(GlobalSetting.Cmd_UpdateMainBase, _UpLevelGOToMainbaseVO[selectedTF.transform.parent.gameObject]);
             }
+            else if (_GameObjectToVO.ContainsKey(selectedTF.transform.parent.gameObject))
+            {
+                IBuildingVO pickItem = _GameObjectToVO[selectedTF.transform.parent.gameObject];
+                if (pickItem.buildingType == E_Building.MainBase)
+                {
+                    SendNotification(GlobalSetting.Cmd_PickMainBase, pickItem);
+                }
+            } 
         }
     }
 
@@ -272,7 +326,14 @@ public class ConstructionMediator : Mediator
 
     private bool IsCanBuildMainBase(MainBaseVO vo)
     {
-        return _MapProxy.IsCanOccupedArea(vo.tilePositon, vo.radius);
+        bool isCanBuild = _MapProxy.IsCanOccupedArea(vo.tilePositon, vo.radius);
+        if (isCanBuild) _BuildingProxy.VisitMainBases(mb => isCanBuild = isCanBuild && GetMainBaseLength(mb, vo) > GlobalSetting.BUILDING_MAINBASE_BUILD_MIN_LENGTH);
+        return isCanBuild;
+    }
+
+    private ushort GetMainBaseLength(MainBaseVO mb, MainBaseVO vo)
+    {
+        return (ushort)(Math.Abs(mb.tilePositon.x - vo.tilePositon.x) + Math.Abs(mb.tilePositon.z - vo.tilePositon.z));
     }
 
     private void BuildBuilding(IBuildingVO vO)
@@ -283,12 +344,15 @@ public class ConstructionMediator : Mediator
         _BuildingTF.localPosition = vO.tilePositon;
 
         _GameObjectToVO.Add(_BuildingTF.gameObject, vO);
-        if (vO.buildingType == E_Building.MainBase) _GameOjectToMainbaseVO.Add(_BuildingTF.gameObject, vO as MainBaseVO);
+        if (vO.buildingType == E_Building.MainBase)
+        {
+            _GameOjectToMainbaseVO.Add(_BuildingTF.gameObject, vO as MainBaseVO);
+            var mainbase = _BuildingTF.gameObject.GetComponent<MainBase>();
+            _MainBaseVOToMainBase.Add(vO as MainBaseVO, mainbase);
+            mainbase.InitMainBase(vO as MainBaseVO);
+        }
 
         vO.postion = _BuildingTF.position;
-
-        //TODO 测试代码 增加军队数量
-        if (vO.buildingType == E_Building.MainBase) (vO as MainBaseVO).soldierNum = 500;
     }
 }
 

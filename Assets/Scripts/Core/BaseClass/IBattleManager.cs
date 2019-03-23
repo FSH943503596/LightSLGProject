@@ -12,7 +12,7 @@ public interface IBattleManager
     /// <summary>
     /// 战斗是否结束
     /// </summary>
-    bool IsBattleOver { get; set; }
+    bool isBattleOver { get; set; }
     /// <summary>
     /// 战斗初始化
     /// </summary>

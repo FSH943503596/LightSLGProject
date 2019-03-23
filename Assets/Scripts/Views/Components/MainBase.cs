@@ -11,6 +11,7 @@ using UnityEngine;
 public class MainBase : Building
 {
     private MainBaseVO m_Data;
+    private int m_CurrentRadius;
     public Transform m_EdgeF;
     public Transform m_EdgeR;
     public Transform m_EdgeB;
@@ -19,27 +20,31 @@ public class MainBase : Building
     public void InitMainBase(MainBaseVO vO)
     {
         this.m_Data = vO;
+        m_CurrentRadius = vO.radius;
     }
     public void UpdateArea()
     {
         if (m_EdgeF && m_EdgeR && m_EdgeB && m_EdgeL)
         {
-            Vector3 newPosition = new Vector3(m_EdgeF.childCount + 1, m_EdgeF.childCount + 1, 0);
-            m_EdgeF.transform.localPosition += Vector3.forward;
-            Transform child = m_EdgeF.GetChild(m_EdgeF.childCount + 1);
-            Instantiate<Transform>(child).localPosition = newPosition;
-
-            m_EdgeB.transform.localPosition -= Vector3.forward;
-            child = m_EdgeF.GetChild(m_EdgeF.childCount + 1);
-            Instantiate<Transform>(child).localPosition = newPosition;
-
-            m_EdgeR.transform.localPosition += Vector3.left;
-            child = m_EdgeF.GetChild(m_EdgeR.childCount + 1);
-            Instantiate<Transform>(child).localPosition = newPosition;
-
-            m_EdgeL.transform.localPosition -= Vector3.left;
-            child = m_EdgeF.GetChild(m_EdgeL.childCount + 1);
-            Instantiate<Transform>(child).localPosition = newPosition;
+            for (int i = 0; i < m_Data.radius - m_CurrentRadius; i++)
+            {
+                Vector3 newPosition = new Vector3(-m_EdgeF.childCount - 1, -m_EdgeF.childCount - 1, 0);
+                ChangeEdge(m_EdgeF, newPosition, Vector3.forward);
+                ChangeEdge(m_EdgeB, newPosition, Vector3.back);
+                ChangeEdge(m_EdgeR, newPosition, Vector3.right);
+                ChangeEdge(m_EdgeL, newPosition, Vector3.left);
+            }
+            m_CurrentRadius = m_Data.radius;
         }
+    }
+
+    private void ChangeEdge(Transform edge, Vector3 newPosition, Vector3 moveVector)
+    {
+        edge.localPosition += moveVector;
+        Transform child = edge.GetChild(edge.childCount - 1);
+        child = Instantiate<Transform>(child);
+        child.SetParent(edge);
+        child.localRotation = Quaternion.identity;
+        child.localPosition = newPosition;
     }
 }
