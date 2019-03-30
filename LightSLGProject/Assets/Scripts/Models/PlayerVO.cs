@@ -13,6 +13,10 @@ using System.Collections.Generic;
 public class PlayerVO
 {
     private static byte OriginID = 0;
+    public static void ResetOriginID()
+    {
+        OriginID = 0;
+    }
 
     private byte _Id;                                                   //玩家ID
     private byte _GroupID;                                              //分组ID

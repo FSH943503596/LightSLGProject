@@ -49,6 +49,7 @@ public class PlayerVOProxy : Proxy
     public void ClearPlayers()
     {
         _Players.Clear();
+        PlayerVO.ResetOriginID();
     }
     /// <summary>
     /// 获取玩家的主基地列表

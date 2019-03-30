@@ -337,6 +337,7 @@ public static class GlobalSetting
     public const string Msg_InitMiniMapMediator = "Msg_InitMiniMapMediator";
     public const string Msg_MapCreateComplete = "Msg_MapCreateComplete";
     public const string Msg_MainbaseCreateComplete = "Msg_MainbaseCreateComplete";
+    public const string Mst_PlayerGenerateComplete = "Mst_PlayerGenerateComplete";
     
 
 

@@ -217,7 +217,7 @@ MonoBehaviour:
   _CurrentUIType:
     IsClearStack: 1
     UIForms_Type: 0
-    UIForms_ShowMode: 2
+    UIForms_ShowMode: 0
     UIForm_LucencyType: 0
   _BtnStartBattle: {fileID: 1467605425510456842}
   _BtnReturnLogin: {fileID: 4183995840812057549}

@@ -45,8 +45,10 @@ public class BattleManager : IBattleManager
 
         //显示初始化战斗面板
         ShowBattleUI();
+        GameFacade.Instance.SendNotification(GlobalSetting.Msg_StartBattle);
         //初始化所有角色
         playerSystem.InitPlayers();
+        GameFacade.Instance.SendNotification(GlobalSetting.Mst_PlayerGenerateComplete);
         //发送初始化战斗场景相机
         GameFacade.Instance.SendNotification(GlobalSetting.Msg_InitBattleCameraMediator);
         //调整相机位置到玩家位置
@@ -54,8 +56,6 @@ public class BattleManager : IBattleManager
         FocuseUserMainBase();
         //生成地图
         mapSystem.PrintMap();
-
-        GameFacade.Instance.SendNotification(GlobalSetting.Msg_StartBattle);
     }
 
     private void FocuseUserMainBase()

@@ -88,6 +88,7 @@ public class PlayerBattleInfoMediator : Mediator
 
     private void UpdatePlayerInfo()
     {
+        if (_UsersPlayerVO == null) return;
         _UIForm.SetMainBaseCount(_UsersPlayerVO.mainBases.Count);
         _UIForm.SetSoldierCount(_UsersPlayerVO.soldierAmount, _UsersPlayerVO.soldierAmountLimit);
         _UIForm.SetGoldInfo(_UsersPlayerVO.gold, _UsersPlayerVO.goldLimit);
