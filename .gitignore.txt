@@ -1,0 +1,5 @@
+*.vs/
+LightSLGProject/Library/
+LightSLGProject/Packages/
+LightSLGProject/Logs/
+LightSLGProject/Temp/
