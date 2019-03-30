@@ -20,5 +20,8 @@ public class MilitaryCampVO : IBuildingVO
 
     public int soldierNumLimit { get => _SoldierNumLimit; set => _SoldierNumLimit = value; }
     public float trainNum { get => _TrainNum; set => _TrainNum = value; }
+
+    public override ushort createCostGold => GlobalSetting.BUILDING_MILITARYCAMP_CREATE_COST[1];
+    public override ushort createCostGrain => GlobalSetting.BUILDING_MILITARYCAMP_CREATE_COST[0];
 }
 

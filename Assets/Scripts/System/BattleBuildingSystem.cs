@@ -12,11 +12,11 @@ using UnityEngine;
 
 public class BattleBuildingSystem : IBattleSystem<BattleManager>
 {
-    private BattleMapSystem mapSystem;
+    private BattleMapSystem _MapSystem;
     private BuildingVOProxy _BuildingVOProxy;
     public BattleBuildingSystem(IBattleManager battleMgr) : base(battleMgr)
     {
-        mapSystem = battleManager.mapSystem;
+        _MapSystem = battleManager.mapSystem;
         _BuildingVOProxy = facade.RetrieveProxy(BuildingVOProxy.NAME) as BuildingVOProxy;
     }
 
@@ -27,16 +27,18 @@ public class BattleBuildingSystem : IBattleSystem<BattleManager>
 
     public override void Update()
     {
-        _BuildingVOProxy.VisitMainBases(UpdateMainbaseVoHandler);
-
+        if (battleManager.isBattleOver) return;
+        _BuildingVOProxy.UpdateMainBasesState(Time.time);
         facade.SendNotification(GlobalSetting.Msg_SetUsersPlayerBattleInfoDirty);
     }
 
-    private void UpdateMainbaseVoHandler(MainBaseVO vo)
+    public override void Release()
     {
-        //主城数据自动更新
-        vo.Update(Time.time);
+        base.Release();
+
+        _BuildingVOProxy.Clear();
     }
+
 
     public bool IsMainBaseCanLevelUp(MainBaseVO vo)
     {

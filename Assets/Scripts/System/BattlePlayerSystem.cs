@@ -47,6 +47,7 @@ public class BattlePlayerSystem : IBattleSystem<BattleManager>
             neutralPlayer = _PlayerProxy.CreatePlayer("和气生财" + 1, 0);
             CreatePlayerFirstMainBase(neutralPlayer, 0.125f + i * 0.5f, 0.375f + i * 0.5f, 0.625f - i * 0.5f, 0.875f - i * 0.5f);
         }
+
     }
     private void CreatePlayerFirstMainBase(PlayerVO enemy, float startXPrec, float endXPrec, float startZPrec, float endZPrec)
     {
@@ -63,9 +64,19 @@ public class BattlePlayerSystem : IBattleSystem<BattleManager>
     }
     public override void Update()
     {
+        if (battleManager.isBattleOver) return;
         _isMainbaseCanLevelStateChange = false;
         _PlayerProxy.VisitAllUserPlayerMainbase(CheckLevelUp);
         if (_isMainbaseCanLevelStateChange) facade.SendNotification(GlobalSetting.Msg_ChangeMainBaseLevelUpState, _UsersMainBasesIsCanLevelUP);
+    }
+
+    public override void Release()
+    {
+        base.Release();
+        _UserPlayer = null;
+        _UserMainBasePosition = default;
+        _UsersMainBasesIsCanLevelUP.Clear();
+        _PlayerProxy.ClearPlayers();
     }
     private void CheckLevelUp(MainBaseVO obj)
     {

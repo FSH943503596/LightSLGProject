@@ -180,5 +180,17 @@ public class PlayerVOProxy : Proxy
     {
         VisitAllPlayerMainBase(GetUserVO(), visitor);
     }
+
+    public void VisitAllPlayers(Action<PlayerVO> visitor)
+    {
+        if (visitor != null)
+        {
+            var enumerator = _Players.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                visitor(enumerator.Current);
+            }
+        }
+    }
 }
 

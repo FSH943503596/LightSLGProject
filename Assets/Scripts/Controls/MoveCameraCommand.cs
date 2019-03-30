@@ -12,6 +12,7 @@ using PureMVC.Patterns;
 using System;
 using UnityEngine;
 
+[Obsolete("不再使用该方法")]
 public class MoveCameraCommand : SimpleCommand
 {
     public override void Execute(INotification notification)

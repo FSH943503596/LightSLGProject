@@ -14,7 +14,7 @@ public class TwoMsgParamsPool<TFirst, TSecond> : MsgParamPool<TwoMsgParamsPool<T
 {
     public TwoMsgParamsPool()
     {
-        _Params = new Stack<TwoMsgParams<TFirst, TSecond>>() as Stack<object>;
+        _Params = new Stack<object>(); ;
     }
 
     public TwoMsgParams<TFirst, TSecond> Pop()
@@ -27,6 +27,7 @@ public class TwoMsgParamsPool<TFirst, TSecond> : MsgParamPool<TwoMsgParamsPool<T
 
     public void Push(TwoMsgParams<TFirst, TSecond> cmdParam)
     {
+        cmdParam.InitParams(default, default);
         _Params.Push(cmdParam);
     }
 }

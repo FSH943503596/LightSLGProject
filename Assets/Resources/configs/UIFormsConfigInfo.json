@@ -16,7 +16,15 @@
 "Value":"UI\\MobilizeTroopsInfoUIForm"},
 
 {"Key":"PlayerBattleInfoUIForm",
-"Value":"UI\\PlayerBattleInfoUIForm"}
+"Value":"UI\\PlayerBattleInfoUIForm"},
 
+{"Key":"ErrorStringTipsUIForm",
+"Value":"UI\\ErrorStringTipsUIForm"},
+
+{"Key":"VictoryUIForm",
+"Value":"UI\\VictoryUIForm"},
+
+{"Key":"FailedUIForm",
+"Value":"UI\\FailedUIForm"}
 ]
 }

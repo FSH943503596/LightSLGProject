@@ -14,22 +14,19 @@ using UnityEngine;
 
 public class BattleMapSystem : IBattleSystem<BattleManager>
 {
-    private IMapPrinter printer;
-    private IMapCreater creator;
-    private IMapChecker checker;
-
-    private Camera sceneCamera;
-
+    private IMapPrinter _Printer;
+    private IMapCreater _Creator;
+    private IMapChecker _Checker;
+    private Camera _SceneCamera;
+    private Transform _CameraTF;
+    private Transform _CameraParentTF;
     private MapVOProxy _MapProxy;
-
-    int[,] maps;
-    //int[,] buildings;
+    private int[,] _Maps;
 
     public GameObject[] tiles;
     public string[] tileNames;
     public bool[] walkable;
-    public Transform TileParent;
-
+    public Transform tileParent;
     public int width;
     public int height;
 
@@ -44,18 +41,17 @@ public class BattleMapSystem : IBattleSystem<BattleManager>
     public ushort maxShowY = 50;
     public Vector3Int showBasePoint;
 
-    private Vector3Int yDelta;
-    private Vector3Int xDelta;
-
-    private Vector3 lastCameraPosition;
+    private Vector3Int _YDelta;
+    private Vector3Int _XDelta;
+    private Vector3 _LastCameraPosition;
 
     public BattleMapSystem(IBattleManager manager) : base(manager)
     {
         width = battleManager.mapWidth;
         height = battleManager.mapHeight;
 
-        yDelta = new Vector3Int(-1, 0, 1);
-        xDelta = new Vector3Int(1, 0, 1);
+        _YDelta = new Vector3Int(-1, 0, 1);
+        _XDelta = new Vector3Int(1, 0, 1);
 
         //测试数据赋值
         tileNames = new string[] { "Hill", "Gobi", "Plain", "River" };
@@ -66,17 +62,19 @@ public class BattleMapSystem : IBattleSystem<BattleManager>
         yOriMax = 2;
         scale = 5f;
 
-        sceneCamera = GameObject.FindGameObjectWithTag(GlobalSetting.TAG_BATTLE_SCENE_CAMERA_NAME).GetComponent<Camera>();
-        TileParent = GameObject.FindGameObjectWithTag(GlobalSetting.TAG_TILE_PARENT_NAME).transform;
+        _SceneCamera = GameObject.FindGameObjectWithTag(GlobalSetting.TAG_BATTLE_SCENE_CAMERA_NAME).GetComponent<Camera>();
+        _CameraTF = _SceneCamera.transform;
+        _CameraParentTF = _CameraTF.parent;
+        tileParent = GameObject.FindGameObjectWithTag(GlobalSetting.TAG_TILE_PARENT_NAME).transform;
         tiles = new GameObject[4];
         tiles[0] = ResourcesMgr.Instance.Load<GameObject>("Hill").res;
         tiles[1] = ResourcesMgr.Instance.Load<GameObject>("Gobi").res;
         tiles[2] = ResourcesMgr.Instance.Load<GameObject>("Plain").res;
         tiles[3] = ResourcesMgr.Instance.Load<GameObject>("River").res;
 
-        creator = new MapCreator(this);
-        checker = new MapChecker(this);
-        printer = new Map45DegreesPrinter(this, TileParent);
+        _Creator = new MapCreator(this);
+        _Checker = new MapChecker(this);
+        _Printer = new Map45DegreesPrinter(this, tileParent);
 
         _MapProxy = facade.RetrieveProxy(MapVOProxy.NAME) as MapVOProxy;
 
@@ -85,46 +83,56 @@ public class BattleMapSystem : IBattleSystem<BattleManager>
             PoolManager.Instance.IncreaseObjectCache(tileNames[i], maxShowX * maxShowY * 3);
         }
     }
-
     public override void Initialize()
     {
         //创建地图
-        maps = creator.CreateMap();
+        _Maps = _Creator.CreateMap();
 
         //检测处理
-        checker.CheckMap(maps);
+        _Checker.CheckMap(_Maps);
 
-        _MapProxy.Init(new MapVO(maps), walkable, sceneCamera, TileParent);
+        _MapProxy.Init(new MapVO(_Maps), walkable, _SceneCamera, tileParent);
 
-        lastCameraPosition = sceneCamera.transform.position;    
+        _LastCameraPosition = _CameraTF.position;    
     }
-
     public void PrintMap()
     {
         Vector3Int centerPosition = _MapProxy.ViewPositionToMap(new Vector3(0.5f, 0.5f, 0));
 
-        showBasePoint = centerPosition - yDelta * (maxShowY / 2) - xDelta * (maxShowX / 2);
+        showBasePoint = centerPosition - _YDelta * (maxShowY / 2) - _XDelta * (maxShowX / 2);
 
         //打印地图
-        printer.PrintMap(maps, showBasePoint.x, maxShowX, showBasePoint.z, maxShowY);
+        _Printer.PrintMap(_Maps, showBasePoint.x, maxShowX, showBasePoint.z, maxShowY);
     }
-
     public override void Release()
     {
-        maps = null;
+        _Maps = null;
         _MapProxy.ClearMapData();
+        _Printer = null;
+        _Creator = null;
+        _Checker = null;
+        _SceneCamera = null;
+        _CameraTF = null;
+        _CameraParentTF = null;
+        _Maps = null;
+        tiles = null;
+        tileNames = null;
+        walkable = null;
+        tileParent = null;
+        weights = null;
     }
-
     public override void Update()
     {
+        if (battleManager.isBattleOver) return;
+
+        Vector3Int currentFocusePosition = _MapProxy.ViewPositionToMap(new Vector3(0.5f, 0.5f, 0));
         //显示处理
-        if (Vector3.SqrMagnitude(lastCameraPosition - sceneCamera.transform.position) > 25)
+        if (Vector3.SqrMagnitude(_LastCameraPosition - currentFocusePosition) > 25)
         {
             PrintMap();
 
-            lastCameraPosition = sceneCamera.transform.position;
+            _LastCameraPosition = currentFocusePosition;
         }
-
     }
 
     /// <summary>
@@ -139,7 +147,6 @@ public class BattleMapSystem : IBattleSystem<BattleManager>
     {
         return _MapProxy.GetBlankInRect(startXPrec, endXPrec, startZPrec, endZPrec);
     }
-
     public void AddBuildingInfo(MainBaseVO vo)
     {
         _MapProxy.SetBuildingInfo(true, vo.tilePositon, vo.rect);
@@ -154,37 +161,42 @@ public class BattleMapSystem : IBattleSystem<BattleManager>
     {
         _MapProxy.ChangeMapInfos(startPos, info);
     }
+    [Obsolete("作废，使用聚焦到指定点消息")]
     public void SetCameraPosition(Vector3 positon)
     {
         positon = WorldToCameraPosition(positon);
-        sceneCamera.transform.parent.position = positon;
+        _CameraParentTF.position = positon;
     }
-
+    [Obsolete("作废，没有具体使用该方法的逻辑")]
     private Vector3 WorldToCameraPosition(Vector3 positon)
     {
-        positon.Scale(Vector3.right + Vector3.forward);
+        //positon.Scale(Vector3.right + Vector3.forward);
         positon.y = GetCameraPositon().y;
         return positon;
     }
-
+    [Obsolete("作废，发送相机移动消息，替换该功能")]
     public void MoveCameraToPosition(Vector3 positon)
     {
-        positon = positon - sceneCamera.transform.parent.position;
+        positon = positon - _SceneCamera.transform.parent.position;
         positon.y = 0;
-        iTween.MoveBy(sceneCamera.transform.parent.gameObject, positon, 1.5f);
+        iTween.MoveBy(_CameraParentTF.gameObject, positon, 1.5f);
     }
+    [Obsolete("作废，没有调用该方法的具体逻辑了")]
     public Vector3 GetCameraPositon()
     {
-        return sceneCamera.transform.position;
+        return _CameraParentTF.position;
     }
+    [Obsolete("作废，没有调用该方法的具体逻辑了")]
     public void CameraTranslate(Vector3 vector)
     {
-        sceneCamera.transform.Translate(vector);
+        _CameraTF.Translate(vector);
     }
+    [Obsolete("作废，没有调用该方法的具体逻辑了")]
     public Vector3 MapPositionToWorld(Vector3 mapPosition)
     {
         return _MapProxy.LocalToWorldMatrix * mapPosition;
     }
+    [Obsolete("作废，没有调用该方法的具体逻辑了")]
     public static Vector3Int ViewPositionToMap(Vector3 veiwPosition, Camera camera, Transform mapParent)
     {
         Vector3 pos = camera.ViewportToWorldPoint(veiwPosition);
@@ -199,7 +211,6 @@ public class BattleMapSystem : IBattleSystem<BattleManager>
 
         return new Vector3Int((int)targetPos.x, 0, (int)targetPos.z);
     }
-
     public bool IsCanOccupedRingArea(Vector3Int position, int internalRadius, int outerRadius)
     {
         return _MapProxy.IsCanOccupedRingArea(position, internalRadius, outerRadius);

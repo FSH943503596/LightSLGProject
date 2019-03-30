@@ -56,6 +56,7 @@ public class GameFacade : Facade
         RegisterMediator(new ConstructionMediator());
         RegisterMediator(new MobilizeTroopsMediator());
         RegisterMediator(new PlayerBattleInfoMediator());
+        RegisterMediator(new BattleCameraMediator());
     }
 
     protected override void InitializeController()
@@ -78,6 +79,7 @@ public class GameFacade : Facade
         RegisterCommand(GlobalSetting.Cmd_MoveCamera, typeof(MoveCameraCommand));
         RegisterCommand(GlobalSetting.Cmd_ReturnLogin, typeof(ReturnLoginCommand));
         RegisterCommand(GlobalSetting.Cmd_UpdateMainBase, typeof(UpdateMainBaseCommand));
+        RegisterCommand(GlobalSetting.Cmd_MainBaseChangeOwer, typeof(MainBaseChangeOwerCommand));
     }  
 }
 

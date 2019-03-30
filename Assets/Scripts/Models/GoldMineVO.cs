@@ -21,5 +21,7 @@ public class GoldMineVO:IBuildingVO
 
     public float goldOutputNum { get => _GoldOutputNum; set => _GoldOutputNum = value; }
     public int goldLimit { get => _GoldLimit; set => _GoldLimit = value; }
+    public override ushort createCostGold => GlobalSetting.BUILDING_GOLDMINE_CREATE_COST[1];
+    public override ushort createCostGrain => GlobalSetting.BUILDING_GOLDMINE_CREATE_COST[0];
 }
 

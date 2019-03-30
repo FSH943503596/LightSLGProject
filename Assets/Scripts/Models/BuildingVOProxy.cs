@@ -17,9 +17,11 @@ using UnityEngine;
 public class BuildingVOProxy : Proxy
 {
     new public const string NAME = "BuildingProxy";
-    Dictionary<int, List<MainBaseVO>> _PlayerToMainBase = new Dictionary<int, List<MainBaseVO>>();
-    Dictionary<IBuildingVO, MainBaseVO> _BuildingToMainBase = new Dictionary<IBuildingVO, MainBaseVO>();
-
+    private Dictionary<int, List<MainBaseVO>> _PlayerToMainBase = new Dictionary<int, List<MainBaseVO>>();
+    private Dictionary<IBuildingVO, MainBaseVO> _BuildingToMainBase = new Dictionary<IBuildingVO, MainBaseVO>();
+    private List<MainBaseVO> _AllMainBases = new List<MainBaseVO>();
+    private List<MainBaseState> _MainBaseStatesRecoverried = new List<MainBaseState>();
+    private Dictionary<MainBaseVO, MainBaseState> _MainBaseStatesInUsed = new Dictionary<MainBaseVO, MainBaseState>();
     private IList<IBuildingVO> _Buildings
     {
         get
@@ -28,9 +30,20 @@ public class BuildingVOProxy : Proxy
         }
     }
 
+    internal void Clear()
+    {
+        _PlayerToMainBase.Clear();
+        _BuildingToMainBase.Clear();
+        _MainBaseStatesRecoverried.Clear();
+        _MainBaseStatesInUsed.Clear();
+        _AllMainBases.Clear();
+    }
+
     public BuildingVOProxy() : base(NAME, new List<IBuildingVO>())
     {   
     }
+
+    public int mainBaseTotalCount => _MainBaseStatesInUsed.Count;
 
     public void CreateBuilding(IBuildingVO buildingVO, MainBaseVO mainBaseVO, PlayerVO player)
     {
@@ -49,7 +62,6 @@ public class BuildingVOProxy : Proxy
 
         if (player.IsUser) SendNotification(GlobalSetting.Msg_SetUsersPlayerBattleInfoDirty);
     }
-
     public void UpdateLevelMainBase(MainBaseVO mainBaseVO)
     {
         var currentData = mainBaseVO.data;
@@ -69,7 +81,6 @@ public class BuildingVOProxy : Proxy
         SendNotification(GlobalSetting.Msg_UpdateMainBase, mainBaseVO);
         SendNotification(GlobalSetting.Msg_SetUsersPlayerBattleInfoDirty);
     }
-
     private MainBaseLevelData GetNextLevelDate(MainBaseVO vO)
     {
         MainBaseLevelData data = vO.data;
@@ -90,19 +101,19 @@ public class BuildingVOProxy : Proxy
 
         return data;
     }
-
     private void SetOriginData(IBuildingVO buildingVO, MainBaseVO mainBaseVO, PlayerVO player)
     {
         switch (buildingVO.buildingType)
         {
             case E_Building.MainBase:
                 var tempMainBaseVO = buildingVO as MainBaseVO;
-                tempMainBaseVO.SetOwer(player);
                 SetMainBaseOriginData(tempMainBaseVO);
                 player.goldLimit += tempMainBaseVO.goldLimit;
                 player.grainLimit += tempMainBaseVO.grainLimit;
                 player.soldierAmount += tempMainBaseVO.soldierNum;
                 player.soldierAmountLimit += tempMainBaseVO.soldierNumLimit;
+                _AllMainBases.Add(tempMainBaseVO);
+                OccupiedMainBase(tempMainBaseVO, Time.time);
                 break;
             case E_Building.FarmLand:
                 var tempFarmLandVO = buildingVO as FarmLandVO;
@@ -129,7 +140,6 @@ public class BuildingVOProxy : Proxy
                 break;
         }
     }
-
     private void SetMilitaryCampOriginData(MilitaryCampVO militaryCampVO)
     {
         militaryCampVO.rect = new RectInt(GlobalSetting.BUILDING_MILITARYCAMP_OFFSET[0], 
@@ -173,7 +183,7 @@ public class BuildingVOProxy : Proxy
             mainBaseVO.goldOutputNum = GlobalSetting.BUILDING_MAINBASE_GOLD_OUTPUT;
             mainBaseVO.grainOutputNum = GlobalSetting.BUILDING_MAINBASE_GRAIN_OUTPUT;
             mainBaseVO.trainNum = GlobalSetting.BUILDING_MAINBASE_SOLDIER_OUTPUT;
-            mainBaseVO.data = StaticDataMgr.mInstance.mMainBaseLevelDataMap[10001];
+            mainBaseVO.data = StaticDataHelper.LevelToMainBaseLevelData[1];
             mainBaseVO.soldierNum = GlobalSetting.PLAYER_ORIGINAL_SOLDIER;
         }
         else
@@ -181,7 +191,7 @@ public class BuildingVOProxy : Proxy
             mainBaseVO.goldOutputNum = GlobalSetting.BUILDING_SUBBASE_GOLD_OUTPUT;
             mainBaseVO.grainOutputNum = GlobalSetting.BUILDING_SUBBASE_GRAIN_OUTPUT;
             mainBaseVO.trainNum = GlobalSetting.BUILDING_SUBBASE_SOLDIER_OUTPUT;
-            mainBaseVO.data = StaticDataMgr.mInstance.mMainBaseLevelDataMap[20001];
+            mainBaseVO.data = StaticDataHelper.LevelToSubBaseLevelData[1];
             mainBaseVO.soldierNum = 0;
         }
 
@@ -189,8 +199,6 @@ public class BuildingVOProxy : Proxy
         mainBaseVO.grainLimit = mainBaseVO.data.GrainLimit;
         mainBaseVO.goldLimit = mainBaseVO.data.GoldLimit;
         mainBaseVO.soldierNumLimit = mainBaseVO.data.SoldierLimit;
-
-        mainBaseVO.OccupiedMainBase(Time.time);
     }
     public MainBaseVO CreateMainBase(PlayerVO owner)
     {
@@ -214,6 +222,26 @@ public class BuildingVOProxy : Proxy
             mainbaseHandler(temp);
         }
     }
+    public void UpdateMainBasesState(float time)
+    {
+        var enumerator = _AllMainBases.GetEnumerator();
+        MainBaseState mainBaseState;
+        
+        while (enumerator.MoveNext())
+        {
+            mainBaseState = _MainBaseStatesInUsed[enumerator.Current];
+
+            if (mainBaseState.IsNeedChange(time))
+            {
+                mainBaseState = ChangeState(mainBaseState);
+                mainBaseState.Enter(time);
+            }
+            else
+            {
+                mainBaseState.Update(time);
+            }         
+        }
+    }
     public bool IsCanLevelUp(MainBaseVO vO)
     {
         bool isCan = false;
@@ -233,7 +261,6 @@ public class BuildingVOProxy : Proxy
 
         return isCan;
     }
-
     public int GetMainbaseNextLevelRadius(MainBaseVO vO)
     {
         int radius = vO.radius;
@@ -254,5 +281,68 @@ public class BuildingVOProxy : Proxy
 
         return radius;
     }
-}
+    private MainBaseState ChangeState(MainBaseState state)
+    {
+        MainBaseState newState;
+        if (state.eMainBaseState == EMainBaseState.Occupied)
+        {
+            newState = GetState(EMainBaseState.Occupying) ?? state;
+        }
+        else
+        {
+            newState = GetState(EMainBaseState.Occupied) ?? state;
+        }
 
+        if (!state.Equals(newState))
+        {
+            newState.Init(state.mainBaseVO, state.occuptedPlayer);
+            _MainBaseStatesRecoverried.Add(state);
+            _MainBaseStatesInUsed[state.mainBaseVO] = newState;
+        }
+
+        return newState;
+    }
+    private MainBaseState GetState(EMainBaseState stateType)
+    {
+        MainBaseState state;
+        state = _MainBaseStatesRecoverried.Find(s => s.eMainBaseState == stateType);
+        if (state != null)
+        {
+            _MainBaseStatesRecoverried.Remove(state);
+        }
+        else
+        {
+            switch (stateType)
+            {
+                case EMainBaseState.None:
+                    break;
+                case EMainBaseState.Occupied:
+                    state = new OccupiedMainBaseState(SendNotification);
+                    break;
+                case EMainBaseState.Occupying:
+                    state = new OccupyingMainBaseState(SendNotification);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        return state;
+    }
+    public void ReceiveSoldier(MainBaseVO mainBaseVO, PlayerVO player, float time)
+    {
+        MainBaseState mainBaseState;
+        if (_MainBaseStatesInUsed.TryGetValue(mainBaseVO, out mainBaseState))
+        {
+            mainBaseState.ReceiveSoldier(player, time);
+        }      
+    }
+    private void OccupiedMainBase(MainBaseVO mainBaseVO, float time)
+    {
+        MainBaseState mainBaseState ;
+        mainBaseState = GetState(EMainBaseState.Occupied);
+        mainBaseState.Init(mainBaseVO, mainBaseVO.ower);
+        mainBaseState.Enter(time);
+        _MainBaseStatesInUsed.Add(mainBaseVO, mainBaseState);
+    }
+}

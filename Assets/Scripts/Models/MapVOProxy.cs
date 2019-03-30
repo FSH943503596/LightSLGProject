@@ -109,16 +109,11 @@ public class MapVOProxy : Proxy
     }
     public Vector3Int ViewPositionToMap(Vector3 veiwPosition)
     {
-        veiwPosition.z = sceneCam.nearClipPlane;
-
-        Vector3 pos = sceneCam.ViewportToWorldPoint(veiwPosition);
-
+        veiwPosition.z = sceneCam.nearClipPlane;      
         Ray ray = sceneCam.ViewportPointToRay(veiwPosition);
-
-        float angle = Vector3.Angle(ray.direction, Vector3.up * -pos.y);
-
-        Vector3 targetPos = ray.GetPoint(Mathf.Abs(pos.y) / Mathf.Cos(angle));
-
+        float angle = Vector3.Angle(ray.direction, -Vector3.up);
+        Vector3 targetPos = ray.GetPoint(Mathf.Abs(ray.origin.y) * Mathf.Tan(angle * Mathf.Deg2Rad));
+        targetPos.y = 0;       
         targetPos = mapParent.worldToLocalMatrix * targetPos;
 
         return new Vector3Int((int)targetPos.x, 0, (int)targetPos.z);

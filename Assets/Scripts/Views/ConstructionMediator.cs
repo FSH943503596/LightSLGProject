@@ -58,7 +58,8 @@ public class ConstructionMediator : Mediator
             GlobalSetting.Msg_InitConstructionMediator,
             GlobalSetting.Msg_BuildBuilding,
             GlobalSetting.Msg_ChangeMainBaseLevelUpState,
-            GlobalSetting.Msg_UpdateMainBase
+            GlobalSetting.Msg_UpdateMainBase,
+            GlobalSetting.Msg_EndBattle
         };
     }
 
@@ -94,9 +95,29 @@ public class ConstructionMediator : Mediator
                     _MainBaseVOToMainBase[mainBase].UpdateArea();
                 }
                 break;
+            case GlobalSetting.Msg_EndBattle:
+                ExitBattleSceneSetting();
+                break;
             default:
                 break;
         }
+    }
+
+    private void ExitBattleSceneSetting()
+    {
+        _BuildingParnet = null;
+        _HUDParent = null;
+        _Building = null;
+        _BuildingTF = null;
+        _CurrentIndicator = null;
+        _IsCanConfirmFunc = null;
+        isCreating = false;
+        _UserPlayerVO = null;
+        _GameObjectToVO.Clear();
+        _GameOjectToMainbaseVO.Clear();
+        _MainBaseVOToMainBase.Clear();
+        _UpLevelGOToMainbaseVO.Clear();
+        uiForm.CloseUIForm();
     }
 
     private void ChangeMainbaseLevelUpState(Dictionary<MainBaseVO, bool> mainbaseLevelUpState)
@@ -132,6 +153,15 @@ public class ConstructionMediator : Mediator
         uiForm.btnMilitaryCamp.onClick.AddListener(() => CreateBuilding(E_Building.MilitaryCamp));
         uiForm.btnFarmLand.onClick.AddListener(() => CreateBuilding(E_Building.FarmLand));
         uiForm.btnGoldMine.onClick.AddListener(() => CreateBuilding(E_Building.GoldMine));
+
+        uiForm.txtCreateSubBaseGrainCost.text = GlobalSetting.BUILDING_SUBBASE_CREATE_COST[0].ToString();
+        uiForm.txtCreateSubBaseGoldCost.text = GlobalSetting.BUILDING_SUBBASE_CREATE_COST[1].ToString();
+        uiForm.txtCreateMilitaryGrainCost.text = GlobalSetting.BUILDING_MILITARYCAMP_CREATE_COST[0].ToString();
+        uiForm.txtCreateMilitaryGoldCost.text = GlobalSetting.BUILDING_MILITARYCAMP_CREATE_COST[1].ToString();
+        uiForm.txtCreateGoldMineGrainCost.text = GlobalSetting.BUILDING_GOLDMINE_CREATE_COST[0].ToString();
+        uiForm.txtCreateGoldMineGoldCost.text = GlobalSetting.BUILDING_GOLDMINE_CREATE_COST[1].ToString();
+        uiForm.txtCreateFarmLandGrainCost.text = GlobalSetting.BUILDING_FARMLAND_CREATE_COST[0].ToString();
+        uiForm.txtCreateFarmLandGoldCost.text = GlobalSetting.BUILDING_FARMLAND_CREATE_COST[1].ToString();
 
         uiForm.btnCancel.onClick.AddListener(Cancel);
         uiForm.btnConfirm.onClick.AddListener(Confirm);
@@ -203,14 +233,19 @@ public class ConstructionMediator : Mediator
         
     }
 
-    private void CreateBuilding(E_Building mainBase)
+    private void CreateBuilding(E_Building buildingType)
     {
+        if (!CheckRequirements(buildingType))
+        {
+            uiForm.ShowErrorMsg("资源不足");
+            return;
+        }
         string prefabName = "";
         string indicatorName = "";
         _CurrentIndicator = null;
         _BuildingTF = null;
         _Building = null;
-        switch (mainBase)
+        switch (buildingType)
         {
             case E_Building.None:
                 break;
@@ -264,6 +299,37 @@ public class ConstructionMediator : Mediator
         ShowBuildingSetup();
 
         _CurrentIndicator.SetIsCanConfirm(_IsCanConfirmFunc());
+    }
+
+    private bool CheckRequirements(E_Building buildingType)
+    {
+        bool returnValue = false;
+        if(_UserPlayerVO == null)_UserPlayerVO = _UserProxy.GetUserVO();
+        switch (buildingType)
+        {
+            case E_Building.None:
+                break;
+            case E_Building.MainBase:
+                returnValue = _UserPlayerVO.grain >= GlobalSetting.BUILDING_SUBBASE_CREATE_COST[0];
+                returnValue = returnValue && _UserPlayerVO.gold >= GlobalSetting.BUILDING_SUBBASE_CREATE_COST[1];
+                break;
+            case E_Building.FarmLand:
+                returnValue = _UserPlayerVO.grain >= GlobalSetting.BUILDING_FARMLAND_CREATE_COST[0];
+                returnValue = returnValue && _UserPlayerVO.gold >= GlobalSetting.BUILDING_FARMLAND_CREATE_COST[1];
+                break;
+            case E_Building.GoldMine:
+                returnValue = _UserPlayerVO.grain >= GlobalSetting.BUILDING_GOLDMINE_CREATE_COST[0];
+                returnValue = returnValue && _UserPlayerVO.gold >= GlobalSetting.BUILDING_GOLDMINE_CREATE_COST[1];
+                break;
+            case E_Building.MilitaryCamp:
+                returnValue = _UserPlayerVO.grain >= GlobalSetting.BUILDING_MILITARYCAMP_CREATE_COST[0];
+                returnValue = returnValue && _UserPlayerVO.gold >= GlobalSetting.BUILDING_MILITARYCAMP_CREATE_COST[1];
+                break;
+            default:
+                break;
+        }
+
+        return returnValue;
     }
 
     public void ShowBuildingSelectList()

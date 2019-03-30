@@ -33,7 +33,9 @@ namespace SUIFW
         //固定窗体                              
         Fixed,
         //弹出窗体
-        PopUp
+        PopUp,
+        //弹出自动关闭Tips
+        Tips
     }
 
     /// <summary>
@@ -78,6 +80,7 @@ namespace SUIFW
         public const string SYS_NORMAL_NODE = "Normal";
         public const string SYS_FIXED_NODE = "Fixed";
         public const string SYS_POPUP_NODE = "PopUp";
+        public const string SYS_TIPS_NODE = "Tips";
         public const string SYS_SCRIPTMANAGER_NODE = "_ScriptMgr";
         /* 遮罩管理器中，透明度常量 */
         public const float SYS_UIMASK_LUCENCY_COLOR_RGB = 255 / 255F;

@@ -14,32 +14,33 @@ using UnityEngine;
 public class BattleTroopSystem : IBattleSystem<BattleManager>
 {
     private Transform _SoldierParent;
-    private List<Troop> troops = new List<Troop>();
-    private List<Troop> waitTroops = new List<Troop>();
-    private int CreateCountPerFrame = 5;
+    private List<Troop> _Troops = new List<Troop>();
+    private List<Troop> _WaitTroops = new List<Troop>();
+    private int _CreateCountPerFrame = 5;
+    private BuildingVOProxy _BuildingProxy;
     public BattleTroopSystem(IBattleManager mgr) : base(mgr)
     {
     }
-
     public override void Initialize()
     {
         _SoldierParent = GameObject.FindGameObjectWithTag(GlobalSetting.TAG_SOLDIERS_PARENT_NAME).transform;
+        _BuildingProxy = facade.RetrieveProxy(BuildingVOProxy.NAME) as BuildingVOProxy;
     }
-
     public override void Update()
     {
+        if (battleManager.isBattleOver) return;
         int total;
         AStarPathFindingAgent agent;
         System.Random random = new System.Random();
         //出兵
-        for (int i = 0; i < troops.Count; i++)
+        for (int i = 0; i < _Troops.Count; i++)
         {
-            Troop troop = troops[i];
-            total = troop.start.soldierNum - CreateCountPerFrame < 0 ? troop.start.soldierNum : CreateCountPerFrame;
+            Troop troop = _Troops[i];
+            total = troop.start.soldierNum - _CreateCountPerFrame < 0 ? troop.start.soldierNum : _CreateCountPerFrame;
             total = troop.amount > total ? total : troop.amount;
             troop.start.soldierNum -= total;
             troop.amount -= total;
-            troops[i] = troop;
+            _Troops[i] = troop;
 
             for (int j = 0; j < total; j++)
             {
@@ -51,23 +52,40 @@ public class BattleTroopSystem : IBattleSystem<BattleManager>
                 agent.StopDistance = troop.end.radius + 0.5f;
                 agent.AddCompleteListener(() =>
                 {
-                    //TODO 士兵到达处理
-                    troop.end.ReceiveSoldier(troop.starter, UnityEngine.Time.time);
-                    PoolManager.Instance.HideObjet(soldier);
+                    //士兵到达处理
+                    SoldierArrivedHandler(troop, soldier);
                     //TODO 处理占领，失败，胜利
                 });
             }    
         }
 
         //移除
-        for (int i = troops.Count - 1; i >= 0; i--)
+        for (int i = _Troops.Count - 1; i >= 0; i--)
         {
-            if (troops[i].amount <= 0)
+            if (_Troops[i].amount <= 0)
             {
-                waitTroops.Add(troops[i]);
-                troops.RemoveAt(i);
+                _WaitTroops.Add(_Troops[i]);
+                _Troops.RemoveAt(i);
             }
         }
+    }
+
+    private void SoldierArrivedHandler(Troop troop, GameObject soldier)
+    {
+        if(!battleManager.isBattleOver)
+        {
+            _BuildingProxy.ReceiveSoldier(troop.end, troop.starter, UnityEngine.Time.time);
+        }
+        
+        PoolManager.Instance.HideObjet(soldier);
+    }
+
+    public override void Release()
+    {
+        base.Release();
+
+        _WaitTroops.Clear();
+        _Troops.Clear();
     }
 
     //创建军队
@@ -76,14 +94,14 @@ public class BattleTroopSystem : IBattleSystem<BattleManager>
         if (start != null && start.soldierNum > 0 && end != null && amount > 0)
         {
             Troop troop = default;
-            if (waitTroops.Count == 0)
+            if (_WaitTroops.Count == 0)
             {
                 troop = new Troop();
             }
             else
             {
-                troop = waitTroops[0];
-                waitTroops.RemoveAt(0);
+                troop = _WaitTroops[0];
+                _WaitTroops.RemoveAt(0);
             }
 
             troop.start = start;
@@ -91,13 +109,9 @@ public class BattleTroopSystem : IBattleSystem<BattleManager>
             troop.end = end;
             troop.amount = amount;
 
-            troops.Add(troop);
-        }
-    }
+            _Troops.Add(troop);
 
-    private void SoldierArriveAtTarget(MainBaseVO mainBaseVO)
-    {
-        //TODO占领
+        }
     }
 
     private struct Troop

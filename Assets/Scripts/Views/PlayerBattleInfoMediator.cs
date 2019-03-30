@@ -36,7 +36,8 @@ public class PlayerBattleInfoMediator : Mediator
         {
             GlobalSetting.Msg_InitPlayerBattleInfoMediator,
             GlobalSetting.Msg_UsersPlayerCreated,
-            GlobalSetting.Msg_SetUsersPlayerBattleInfoDirty
+            GlobalSetting.Msg_SetUsersPlayerBattleInfoDirty,
+            GlobalSetting.Msg_EndBattle
         };
     }
 
@@ -60,6 +61,12 @@ public class PlayerBattleInfoMediator : Mediator
                 {
                     InitUsersPlayerInfo(player);
                 }
+                break;
+            case GlobalSetting.Msg_EndBattle:
+                _UsersPlayerVODirty = false;
+                _UsersPlayerVO = null;
+                _UIForm.SetDefaultInfo();
+                _UIForm.CloseUIForm();
                 break;
             default:
                 break;

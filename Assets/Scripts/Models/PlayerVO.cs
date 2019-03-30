@@ -43,9 +43,13 @@ public class PlayerVO
     /// <param name="mainBase"></param>
     /// <returns>添加的基地是否设置成主基地</returns>
     public bool AddMainBases(MainBaseVO mainBase) {
-        if (mainBase == null) return false;
+        if (mainBase == null || _MainBases.Contains(mainBase)) return false;
 
         _MainBases.Add(mainBase);
+
+        _GoldLimit += mainBase.goldLimit;
+        _GrainLimit += mainBase.grainLimit;
+        _SoldierAmountLimit += mainBase.soldierNumLimit;
 
         return _MainBases.Count < 2;
     }
@@ -66,6 +70,12 @@ public class PlayerVO
     public void RemoveMainBaseVO(MainBaseVO vO)
     {
         if (vO == null || !_MainBases.Contains(vO)) return;
+
+        //去除所有上限加成
+
+        _GoldLimit -= vO.goldLimit;
+        _GrainLimit -= vO.grainLimit;
+        _SoldierAmountLimit -= vO.soldierNumLimit;
 
         _MainBases.Remove(vO);
     }

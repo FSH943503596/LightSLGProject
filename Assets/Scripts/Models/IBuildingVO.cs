@@ -15,10 +15,12 @@ public abstract class IBuildingVO
     protected string _PrefabName = "Building";
     protected Vector3Int _TilePositon;
     protected Vector3 _Postion;
-    protected RectInt _Rect = new RectInt(0,0,4,1);
+    protected RectInt _Rect = new RectInt(0, 0, 4, 1);
     protected E_Building _BuildingType = E_Building.None;
     protected int _RotateValue = 0;
 
+    public abstract ushort createCostGold {get; }
+    public abstract ushort createCostGrain { get; }
     public Vector3Int tilePositon { get => _TilePositon; set => _TilePositon = value; }
     public RectInt rect { get => _Rect; set => _Rect = value; }
     public string prefabName { get => _PrefabName; set => _PrefabName = value; }

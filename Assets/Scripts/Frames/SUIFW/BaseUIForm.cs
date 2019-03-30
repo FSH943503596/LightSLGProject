@@ -120,6 +120,18 @@ namespace SUIFW
             UIManager.Instance.ShowUIForms(uiFormName);
         }
 
+        public void ShowErrorMsg(string errorMsg)
+        {
+            UIManager.Instance.ShowUIForms("ErrorStringTipsUIForm", uiForm=>
+            {
+                ErrorStringTipsUIForm form = uiForm as ErrorStringTipsUIForm;
+                if (form != null)
+                {
+                    form.SetMsg(errorMsg);
+                }
+            });
+        }
+
         /// <summary>
         /// 关闭当前UI窗体
         /// </summary>

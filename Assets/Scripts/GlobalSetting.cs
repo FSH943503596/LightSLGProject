@@ -22,6 +22,29 @@ public enum E_Building : byte
 }
 public static class GlobalSetting
 {
+    #region BattleCamera
+    /// <summary>
+    /// 相机视野水平面，Z轴最小偏移值
+    /// </summary>
+    public static readonly float CAMERA_MIN_Z_OFFSET = 5;
+    /// <summary>
+    /// 相机事业水平面，Z轴最大偏移值
+    /// </summary>
+    public static readonly float CAMERA_MAX_Z_OFFSET = 15;
+    /// <summary>
+    /// 相机最小可视角度
+    /// </summary>
+    public static readonly float CAMERA_MIN_ANGLE = 30;
+    /// <summary>
+    /// 相机最大可视角度
+    /// </summary>
+    public static readonly float CAMERA_MAX_ANGLE = 60;
+    /// <summary>
+    /// 相机的固定高度
+    /// </summary>
+    public static readonly float CAMERA_HIGHT = 10;
+    #endregion
+
     #region Tile
     /// <summary>
     /// 山地地形对产出影响（粮食Val|粮食Per|金矿Val|金矿Per）
@@ -46,7 +69,7 @@ public static class GlobalSetting
     /// <summary>
     /// 丘陵对行军速度影响（士兵速度 = 初始速度 * value / 10000）
     /// </summary>
-    public static readonly ushort TILE_HILLS__WALKABLE;
+    public static readonly ushort TILE_HILLS_WALKABLE;
     /// <summary>
     /// 平原对行军速度影响（士兵速度 = 初始速度 * value / 10000）
     /// </summary>
@@ -142,6 +165,10 @@ public static class GlobalSetting
     /// 兵营创建花费（粮食|金矿）
     /// </summary>
     public static readonly ushort[] BUILDING_MILITARYCAMP_CREATE_COST;
+    /// <summary>
+    /// 分城创建花费
+    /// </summary>
+    public static readonly ushort[] BUILDING_SUBBASE_CREATE_COST;
     /// <summary>
     /// 分城金矿产量
     /// </summary>
@@ -268,7 +295,7 @@ public static class GlobalSetting
         Color.red,
         Color.yellow,
     };
-    
+
     #endregion
 
     #region 消息定义
@@ -286,11 +313,13 @@ public static class GlobalSetting
     public const string Cmd_MoveTroops = "Cmd_MoveTroops";
     public const string Cmd_MoveCamera = "Cmd_MoveCamera";
     public const string Cmd_UpdateMainBase = "Cmd_UpdateMainBase";
+    public const string Cmd_MainBaseChangeOwer = "Cmd_PlayerFaild";
 
     //MVC Msg
     public const string Msg_InitConstructionMediator = "Msg_InitConstructionMediator";
     public const string Msg_InitLoginMediator = "Msg_InitLoginMediator";
     public const string Msg_InitMainMediator = "Msg_InitMainMediator";
+    public const string Msg_InitBattleCameraMediator = "Msg_InitBattleCameraMediator";
     public const string Msg_InitMobilizeTroopsMediator = "Msg_InitMobilizeTroopsMediator";
     public const string Msg_InitPlayerBattleInfoMediator = "Msg_InitPlayerBattleInfoMediator";
     public const string Msg_BuildBuilding = "Msg_BuildBuilding";
@@ -299,6 +328,12 @@ public static class GlobalSetting
     public const string Msg_SetUsersPlayerBattleInfoDirty = "Msg_SetUsersPlayerBattleInfoDirty";
     public const string Msg_ChangeMainBaseLevelUpState = "Msg_ChangeMainBaseLevelUpState";
     public const string Msg_UpdateMainBase = "Msg_UpdateMainBase";
+    public const string Msg_AdjustFocuses = "Msg_AdjustFocuses";
+    public const string Msg_MoveCamera = "Msg_MoveCamera";
+    public const string Msg_CameraFocusPoint = "Msg_CameraFocusPoint";
+    public const string Msg_PlayerFaild = "Msg_PlayerFaild";
+    public const string Msg_EndBattle = "Msg_EndBattle";
+    public const string Msg_StartBattle = "Msg_StartBattle";
     #endregion
 
     #region UIForm定义及初始化Command
@@ -307,6 +342,9 @@ public static class GlobalSetting
     public const string UI_MainUIForm = "MainUIForm";                               //出兵信息界面
     public const string UI_MobilizeTroopsInfoUIForm = "MobilizeTroopsInfoUIForm";   //主界面
     public const string UI_PlayerBattleInfoUIForm = "PlayerBattleInfoUIForm";       //玩家战斗信息
+    public const string UI_ErrorStringTipsUIForm = "ErrorStringTipsUIForm";         //错误信息弹窗
+    public const string UI_VictoryUIForm = "VictoryUIForm";                         //胜利界面
+    public const string UI_FailedUIForm = "FailedUIForm";                           //失败界面
     #endregion
 
     //初始化参数
@@ -318,7 +356,7 @@ public static class GlobalSetting
         TILE_PlAIN_OUTPUT_EFFECT = StaticDataHelper.GetShortArrayGSV("TILE_PlAIN_OUTPUT_EFFECT");
         TILE_LAKES_OUTPUT_EFFECT = StaticDataHelper.GetShortArrayGSV("TILE_LAKES_OUTPUT_EFFECT");
         TILE_MOUNTAIN_WALKABLE = StaticDataHelper.GetUshortGSV("TILE_MOUNTAIN_WALKABLE");
-        TILE_HILLS__WALKABLE = StaticDataHelper.GetUshortGSV("TILE_HILLS__WALKABLE");
+        TILE_HILLS_WALKABLE = StaticDataHelper.GetUshortGSV("TILE_HILLS__WALKABLE");
         TILE_PlAIN_WALKABLE = StaticDataHelper.GetUshortGSV("TILE_PlAIN_WALKABLE");
         TILE_LAKES_WALKABLE = StaticDataHelper.GetUshortGSV("TILE_LAKES_WALKABLE");
 
@@ -343,6 +381,7 @@ public static class GlobalSetting
         BULDING_MAINBASE_OCCUPIED_TIME = StaticDataHelper.GetFloatGSV("BULDING_MAINBASE_OCCUPIED_TIME");
         BUILDING_FARMLAND_CREATE_COST = StaticDataHelper.GetUshortArrayGSV("BUILDING_FARMLAND_CREATE_COST");
         BUILDING_GOLDMINE_CREATE_COST = StaticDataHelper.GetUshortArrayGSV("BUILDING_GOLDMINE_CREATE_COST");
+        BUILDING_SUBBASE_CREATE_COST = StaticDataHelper.GetUshortArrayGSV("BUILDING_SUBBASE_CREATE_COST");
         BUILDING_MILITARYCAMP_CREATE_COST = StaticDataHelper.GetUshortArrayGSV("BUILDING_MILITARYCAMP_CREATE_COST");
         BUILDING_SUBBASE_GOLD_OUTPUT = StaticDataHelper.GetUshortGSV("BUILDING_SUBBASE_GOLD_OUTPUT");
         BUILDING_SUBBASE_GRAIN_OUTPUT = StaticDataHelper.GetUshortGSV("BUILDING_SUBBASE_GRAIN_OUTPUT");
@@ -351,6 +390,8 @@ public static class GlobalSetting
         BUILDING_FARMLAND_GRAIN_LIMIT = StaticDataHelper.GetUshortGSV("BUILDING_FARMLAND_GRAIN_LIMIT");
         BUILDING_GOLDMINE_GOLD_LIMIT = StaticDataHelper.GetUshortGSV("BUILDING_GOLDMINE_GOLD_LIMIT");
         BUILDING_MAINBASE_BUILD_MIN_LENGTH = StaticDataHelper.GetUshortGSV("BUILDING_MAINBASE_BUILD_MIN_LENGTH");
+
+
 
         //初始化Player信息
         PLAYER_ORIGINAL_GRAIN = StaticDataHelper.GetUshortGSV("PLAYER_ORIGINAL_GRAIN");

@@ -29,8 +29,8 @@ public class MobilizeTroopsMediator : Mediator
         return new List<string>()
         {
             GlobalSetting.Msg_PickMainBase,
-            GlobalSetting.Msg_InitMobilizeTroopsMediator
-            
+            GlobalSetting.Msg_InitMobilizeTroopsMediator,
+            GlobalSetting.Msg_EndBattle     
         };
     }
 
@@ -84,6 +84,11 @@ public class MobilizeTroopsMediator : Mediator
                     }
                 }
                 break;
+            case GlobalSetting.Msg_EndBattle:
+                _OriginMainBaseVO = null;
+                _TargetMainBaseVO = null;
+                _UIForm.CloseUIForm();
+                break;
             default:
                 break;
         }
@@ -107,9 +112,9 @@ public class MobilizeTroopsMediator : Mediator
 
     private void MoveCameraToMainBase(MainBaseVO mainBaseVO)
     {
-        var positon = OneMsgParamsPool<Vector3>.Instance.Pop();
-        positon.InitParams(mainBaseVO.postion);
-        SendNotification(GlobalSetting.Cmd_MoveCamera, positon);
+        var positon = TwoMsgParamsPool<float, float>.Instance.Pop();
+        positon.InitParams(mainBaseVO.postion.x, mainBaseVO.postion.z);
+        SendNotification(GlobalSetting.Msg_CameraFocusPoint, positon);
     }
 }
 

@@ -17,20 +17,37 @@ public class ConstructionUIForm :BaseUIForm
     [SerializeField] private Button _BtnGoldMine;
     [SerializeField] private Button _BtnFarmLand;
 
+    [SerializeField] private Text _TxtCreateSubBaseGoldCost;
+    [SerializeField] private Text _TxtCreateSubBaseGrainCost;
+    [SerializeField] private Text _TxtCreateMilitaryGoldCost;
+    [SerializeField] private Text _TxtCreateMilitaryGrainCost;
+    [SerializeField] private Text _TxtCreateGoldMineGoldCost;
+    [SerializeField] private Text _TxtCreateGoldMineGrainCost;
+    [SerializeField] private Text _TxtCreateFarmLandGoldCost;
+    [SerializeField] private Text _TxtCreateFarmLandGrainCost;
+
     [SerializeField] private Transform _BuildingSetup;
     [SerializeField] private Button _BtnCancel;
     [SerializeField] private Button _BtnInfo;
     [SerializeField] private Button _BtnTurn;
     [SerializeField] private Button _BtnConfirm;
 
-    public Button btnMainBase { get => _BtnMainBase;}
-    public Button btnMilitaryCamp { get => _BtnMilitaryCamp;}
-    public Button btnGoldMine { get => _BtnGoldMine;}
-    public Button btnFarmLand { get => _BtnFarmLand;}
-    public Button btnCancel { get => _BtnCancel;}
-    public Button btnInfo { get => _BtnInfo;}
-    public Button btnTurn { get => _BtnTurn;}
-    public Button btnConfirm { get => _BtnConfirm;}
+    public Button btnMainBase => _BtnMainBase;
+    public Button btnMilitaryCamp => _BtnMilitaryCamp;
+    public Button btnGoldMine => _BtnGoldMine;
+    public Button btnFarmLand => _BtnFarmLand;
+    public Button btnCancel => _BtnCancel;
+    public Button btnInfo => _BtnInfo;
+    public Button btnTurn => _BtnTurn;
+    public Button btnConfirm => _BtnConfirm;
+    public Text txtCreateSubBaseGoldCost => _TxtCreateSubBaseGoldCost;
+    public Text txtCreateSubBaseGrainCost => _TxtCreateSubBaseGrainCost;
+    public Text txtCreateMilitaryGoldCost => _TxtCreateMilitaryGoldCost; 
+    public Text txtCreateMilitaryGrainCost => _TxtCreateMilitaryGrainCost;
+    public Text txtCreateGoldMineGoldCost => _TxtCreateGoldMineGoldCost;
+    public Text txtCreateGoldMineGrainCost => _TxtCreateGoldMineGrainCost;
+    public Text txtCreateFarmLandGoldCost => _TxtCreateFarmLandGoldCost;
+    public Text txtCreateFarmLandGrainCost => _TxtCreateFarmLandGrainCost;
 
     public void ShowBuildingSelectList()
     {

@@ -14,23 +14,24 @@ public class BattleManager : IBattleManager
 {
     public static readonly BattleManager Instance = new BattleManager();
 
+    private BattleManager() { }
+
+    private int _MapWidth;
+    private int _MapHeight;
+
     public BattleMapSystem mapSystem;
     public BattleBuildingSystem buildingSystem;
     public BattlePlayerSystem playerSystem;
     public SLGInputSystem inputSystem;
     public BattleTroopSystem troopSystem;
-
-    private int _MapWidth;
-    private int _MapHeight;
-
-    private BattleManager() { }
-
     public bool isBattleOver { get; set; }
-    public int mapWidth { get => _MapWidth;}
-    public int mapHeight { get => _MapHeight;}
+    public int mapWidth => _MapWidth;
+    public int mapHeight => _MapHeight;
 
     public void Initinal()
     {
+        isBattleOver = false;
+
         mapSystem = new BattleMapSystem(this);
         mapSystem.Initialize();
         buildingSystem = new BattleBuildingSystem(this);
@@ -46,10 +47,22 @@ public class BattleManager : IBattleManager
         ShowBattleUI();
         //初始化所有角色
         playerSystem.InitPlayers();
+        //发送初始化战斗场景相机
+        GameFacade.Instance.SendNotification(GlobalSetting.Msg_InitBattleCameraMediator);
         //调整相机位置到玩家位置
-        mapSystem.SetCameraPosition(playerSystem.UserMainBasePosition);
+        //mapSystem.SetCameraPosition(playerSystem.UserMainBasePosition);
+        FocuseUserMainBase();
         //生成地图
         mapSystem.PrintMap();
+
+        GameFacade.Instance.SendNotification(GlobalSetting.Msg_StartBattle);
+    }
+
+    private void FocuseUserMainBase()
+    {
+        var position = TwoMsgParamsPool<float, float>.Instance.Pop();
+        position.InitParams(playerSystem.UserMainBasePosition.x, playerSystem.UserMainBasePosition.z);
+        GameFacade.Instance.SendNotification(GlobalSetting.Msg_CameraFocusPoint, position);
     }
 
     private void ShowBattleUI()
@@ -66,12 +79,22 @@ public class BattleManager : IBattleManager
 
     public void Release()
     {
+        GameFacade.Instance.SendNotification(GlobalSetting.Msg_EndBattle);
+
+        inputSystem.Release();
         troopSystem.Release();
-        mapSystem.Release();      
+        playerSystem.Release();
+        buildingSystem.Release();
+        mapSystem.Release();
+       
+        PoolManager.Instance.ClearData();     
+        System.GC.Collect();
     }
 
     public void Update()
     {
+        if (isBattleOver) return;
+
         inputSystem.Update();
         mapSystem.Update();
         troopSystem.Update();
@@ -81,18 +104,32 @@ public class BattleManager : IBattleManager
 
     public void ShowConstraction(Transform builidTF)
     {
-        inputSystem.LongTapItem = builidTF;
+        inputSystem.longTapItem = builidTF;
     }
 
     public void CancelConstraction()
     {
-        inputSystem.LongTapItem = null;
-        inputSystem.DragItem = null;
+        inputSystem.longTapItem = null;
+        inputSystem.dragItem = null;
     }
 
     public void SetMapRect(int width, int height)
     {
         _MapWidth = width;
         _MapHeight = height;
+    }
+
+    public void SetBattleResult(bool isUserWin)
+    {
+        if (isUserWin)
+        {
+            UIManager.Instance.ShowUIForms(GlobalSetting.UI_VictoryUIForm);
+        }
+        else
+        {
+            UIManager.Instance.ShowUIForms(GlobalSetting.UI_FailedUIForm);
+        }
+
+        isBattleOver = true;
     }
 }

@@ -28,6 +28,15 @@ public class ConfirmConstructionCommand : SimpleCommand
 
             PlayerVO userVo = playerVOProxy.GetUserVO();
 
+            //判断资源是否满足创建需求
+            if (userVo.gold < building.createCostGold || userVo.grain < building.createCostGrain)
+            {
+                return;
+            }
+
+            userVo.gold -= building.createCostGold;
+            userVo.grain -= building.createCostGrain;
+
             switch (building.buildingType)
             {
                 case E_Building.None:
@@ -39,15 +48,17 @@ public class ConfirmConstructionCommand : SimpleCommand
                     {
                         if (mapVOProxy.IsCanOccupedArea(mainBaseVO.tilePositon, mainBaseVO.radius))
                         {
-                            
-                            userVo.AddMainBases(building as MainBaseVO);
+
+                            mainBaseVO.SetOwer(userVo);
+                            buildingProxy.CreateBuilding(mainBaseVO, mainBaseVO, userVo);
+                            //userVo.AddMainBases(building as MainBaseVO);
                             //更新地图建筑信息
                             mapVOProxy.SetBuildingInfo(true, building.tilePositon, building.rect);
                             //更新占领信息
                             mapVOProxy.SetOccupiedInfo(true, building.tilePositon, mainBaseVO.radius);
-                            buildingProxy.CreateBuilding(mainBaseVO, mainBaseVO, userVo);
+                            //buildingProxy.CreateBuilding(mainBaseVO, mainBaseVO, userVo);
 
-                            mainBaseVO.SetOwer(userVo);
+                            //mainBaseVO.SetOwer(userVo);
                         }
                     } 
                     break;

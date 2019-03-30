@@ -41,6 +41,8 @@ namespace SUIFW
 	    private Transform _TraFixed = null;
         //弹出节点
 	    private Transform _TraPopUp = null;
+        //Tips节点
+        private Transform _TraTips = null;
         //UI管理脚本的节点
 	    private Transform _TraUIScripts = null;
 
@@ -76,6 +78,7 @@ namespace SUIFW
 	        _TraNormal = UnityHelper.FindTheChildNode(_TraCanvasTransfrom.gameObject, SysDefine.SYS_NORMAL_NODE);
             _TraFixed = UnityHelper.FindTheChildNode(_TraCanvasTransfrom.gameObject, SysDefine.SYS_FIXED_NODE);
             _TraPopUp = UnityHelper.FindTheChildNode(_TraCanvasTransfrom.gameObject, SysDefine.SYS_POPUP_NODE);
+            _TraTips = UnityHelper.FindTheChildNode(_TraCanvasTransfrom.gameObject, SysDefine.SYS_TIPS_NODE);
             _TraUIScripts = UnityHelper.FindTheChildNode(_TraCanvasTransfrom.gameObject,SysDefine.SYS_SCRIPTMANAGER_NODE);
 
             //把本脚本作为“根UI窗体”的子节点。
@@ -93,7 +96,7 @@ namespace SUIFW
         /// 2: 根据不同的UI窗体的“显示模式”，分别作不同的加载处理
         /// </summary>
         /// <param name="uiFormName">UI窗体预设的名称</param>
-	    public void ShowUIForms(string uiFormName)
+	    public void ShowUIForms(string uiFormName, Action<BaseUIForm> setParamHandler = null)
         {
             BaseUIForm baseUIForms=null;                    //UI窗体基类
 
@@ -108,6 +111,12 @@ namespace SUIFW
             if (baseUIForms.CurrentUIType.IsClearStack)
             {
                 ClearStackArray();
+            }
+
+            //设置参数
+            if (setParamHandler != null)
+            {
+                setParamHandler(baseUIForms);
             }
 
             //根据不同的UI窗体的显示模式，分别作不同的加载处理
@@ -283,6 +292,9 @@ namespace SUIFW
                         break;
                     case UIFormType.PopUp:                  //弹出窗体节点
                         goCloneUIPrefabs.transform.SetParent(_TraPopUp, false);
+                        break;
+                    case UIFormType.Tips:
+                        goCloneUIPrefabs.transform.SetParent(_TraTips, false);
                         break;
                     default:
                         break;
