@@ -1,5 +1,8 @@
-*.vs/
+LightSLGProject/.vs/
 LightSLGProject/Library/
 LightSLGProject/Packages/
 LightSLGProject/Logs/
 LightSLGProject/Temp/
+LightSLGProject/obj/
+LightSLGProject/obj/Debug/
+*.csproj

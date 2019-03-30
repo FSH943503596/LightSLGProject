@@ -334,6 +334,9 @@ public static class GlobalSetting
     public const string Msg_PlayerFaild = "Msg_PlayerFaild";
     public const string Msg_EndBattle = "Msg_EndBattle";
     public const string Msg_StartBattle = "Msg_StartBattle";
+    public const string Msg_InitMiniMapMediator = "Msg_InitMiniMapMediator";
+
+
     #endregion
 
     #region UIForm定义及初始化Command
