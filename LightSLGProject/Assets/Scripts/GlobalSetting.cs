@@ -327,7 +327,7 @@ public static class GlobalSetting
     public const string Msg_UsersPlayerCreated = "Msg_UsersPlayerCreated";
     public const string Msg_SetUsersPlayerBattleInfoDirty = "Msg_SetUsersPlayerBattleInfoDirty";
     public const string Msg_ChangeMainBaseLevelUpState = "Msg_ChangeMainBaseLevelUpState";
-    public const string Msg_UpdateMainBase = "Msg_UpdateMainBase";
+    public const string Msg_UpdateMainBase = "Msg_UpdateMainBase";                                  
     public const string Msg_AdjustFocuses = "Msg_AdjustFocuses";
     public const string Msg_MoveCamera = "Msg_MoveCamera";
     public const string Msg_CameraFocusPoint = "Msg_CameraFocusPoint";
@@ -335,6 +335,9 @@ public static class GlobalSetting
     public const string Msg_EndBattle = "Msg_EndBattle";
     public const string Msg_StartBattle = "Msg_StartBattle";
     public const string Msg_InitMiniMapMediator = "Msg_InitMiniMapMediator";
+    public const string Msg_MapCreateComplete = "Msg_MapCreateComplete";
+    public const string Msg_MainbaseCreateComplete = "Msg_MainbaseCreateComplete";
+    
 
 
     #endregion

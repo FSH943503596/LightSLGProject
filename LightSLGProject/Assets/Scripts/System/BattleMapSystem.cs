@@ -93,7 +93,9 @@ public class BattleMapSystem : IBattleSystem<BattleManager>
 
         _MapProxy.Init(new MapVO(_Maps), walkable, _SceneCamera, tileParent);
 
-        _LastCameraPosition = _CameraTF.position;    
+        _LastCameraPosition = _CameraTF.position;
+
+        facade.SendNotification(GlobalSetting.Msg_MapCreateComplete, _MapProxy.hypsometricMap);   
     }
     public void PrintMap()
     {

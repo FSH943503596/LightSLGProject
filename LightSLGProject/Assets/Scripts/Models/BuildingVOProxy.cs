@@ -114,6 +114,8 @@ public class BuildingVOProxy : Proxy
                 player.soldierAmountLimit += tempMainBaseVO.soldierNumLimit;
                 _AllMainBases.Add(tempMainBaseVO);
                 OccupiedMainBase(tempMainBaseVO, Time.time);
+
+                SendNotification(GlobalSetting.Msg_MainbaseCreateComplete, tempMainBaseVO);
                 break;
             case E_Building.FarmLand:
                 var tempFarmLandVO = buildingVO as FarmLandVO;

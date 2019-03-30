@@ -64,14 +64,19 @@ public class PlayerBattleInfoMediator : Mediator
                 }
                 break;
             case GlobalSetting.Msg_EndBattle:
-                _UsersPlayerVODirty = false;
-                _UsersPlayerVO = null;
-                _UIForm.SetDefaultInfo();
-                _UIForm.CloseUIForm();
+                EndBattleSetting();
                 break;
             default:
                 break;
         }
+    }
+
+    private void EndBattleSetting()
+    {
+        _UsersPlayerVODirty = false;
+        _UsersPlayerVO = null;
+        _UIForm.SetDefaultInfo();
+        _UIForm.CloseUIForm();
     }
 
     private void InitUsersPlayerInfo(PlayerVO vo)
