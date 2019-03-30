@@ -59,7 +59,8 @@ public class ConstructionMediator : Mediator
             GlobalSetting.Msg_BuildBuilding,
             GlobalSetting.Msg_ChangeMainBaseLevelUpState,
             GlobalSetting.Msg_UpdateMainBase,
-            GlobalSetting.Msg_EndBattle
+            GlobalSetting.Msg_EndBattle,
+            GlobalSetting.Msg_StartBattle
         };
     }
 
@@ -98,9 +99,19 @@ public class ConstructionMediator : Mediator
             case GlobalSetting.Msg_EndBattle:
                 ExitBattleSceneSetting();
                 break;
+            case GlobalSetting.Msg_StartBattle:
+                StartBattleSetting();
+                break;
             default:
                 break;
         }
+    }
+
+    private void StartBattleSetting()
+    {
+        _BuildingParnet = GameObject.FindGameObjectWithTag(GlobalSetting.TAG_BUILDING_PARENT_NAME).transform;
+        _HUDParent = GameObject.FindGameObjectWithTag(GlobalSetting.TAG_HUD_PARENT_NAME).transform;
+        CreateBuildingIndicator();
     }
 
     private void ExitBattleSceneSetting()
@@ -168,15 +179,11 @@ public class ConstructionMediator : Mediator
         uiForm.btnInfo.onClick.AddListener(ShowBuildingInfo);
         uiForm.btnTurn.onClick.AddListener(RotateBuilding);
 
-        _BuildingParnet = GameObject.FindGameObjectWithTag(GlobalSetting.TAG_BUILDING_PARENT_NAME).transform;
-        _HUDParent = GameObject.FindGameObjectWithTag(GlobalSetting.TAG_HUD_PARENT_NAME).transform;
+
         _MapProxy = Facade.RetrieveProxy(MapVOProxy.NAME) as MapVOProxy;
-
         _UserProxy = Facade.RetrieveProxy(PlayerVOProxy.NAME) as PlayerVOProxy;
-
         _BuildingProxy = Facade.RetrieveProxy(BuildingVOProxy.NAME) as BuildingVOProxy;
 
-        CreateBuildingIndicator();
     }
 
     private void CreateBuildingIndicator()

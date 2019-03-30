@@ -15,21 +15,23 @@ using UnityEngine;
 public class MapVOProxy : Proxy
 {
     new public const string NAME = "MapVOProxy";
-    private bool[] walkable;
-    private NavigationGridVO NavigationGridVO;
-    private int width;
-    private int height;
-    private Camera sceneCam;
-    private Transform mapParent;
+    private bool[] _Walkable;
+    private NavigationGridVO _NavigationGridVO;
+    private int _Width;
+    private int _Height;
+    private Camera _SceneCam;
+    private Transform _MapParent;
+    private float[,] _HypsometricMap;
 
-    public MapVO MapData
+    public MapVO mapData
     {
         get
         {
             return base.m_data as MapVO;
         }
     }
-    public Matrix4x4 LocalToWorldMatrix { get => mapParent.localToWorldMatrix; }
+    public Matrix4x4 localToWorldMatrix { get => _MapParent.localToWorldMatrix; }
+    public float[,] hypsometricMap { get => _HypsometricMap; set => _HypsometricMap = value; }
 
     public MapVOProxy() : base(NAME) { }
     public void Init(MapVO mapData, bool[] walkable, Camera sceneCam, Transform mapParent)
@@ -37,22 +39,22 @@ public class MapVOProxy : Proxy
         if (mapData != null && walkable != null)
         {
             base.m_data = mapData;
-            this.walkable = walkable;
+            this._Walkable = walkable;
 
-            width = mapData.Width;
-            height = mapData.Height;
+            _Width = mapData.Width;
+            _Height = mapData.Height;
 
-            this.sceneCam = sceneCam;
-            this.mapParent = mapParent;
+            this._SceneCam = sceneCam;
+            this._MapParent = mapParent;
 
-            NavigationGridVO = new NavigationGridVO(width, height);
-            NavigationGridVO.SetWalableInfoAllMap(IsWalkable);
+            _NavigationGridVO = new NavigationGridVO(_Width, _Height);
+            _NavigationGridVO.SetWalableInfoAllMap(IsWalkable);
         }
     }
     public bool IsWalkable(int x, int z)
     {
-        MapVO data = MapData;
-        return !data.IsOccupied(x, z) && walkable[MapData.GetValue(x, z)];
+        MapVO data = mapData;
+        return !data.IsOccupied(x, z) && _Walkable[mapData.GetValue(x, z)];
     }
     public bool IsWalkable(Vector3Int position)
     {
@@ -60,25 +62,25 @@ public class MapVOProxy : Proxy
     }
     public bool IsBlank(int x, int z)
     {
-        return !MapData.IsBuilding(x, z) && walkable[MapData.GetValue(x, z)];
+        return !mapData.IsBuilding(x, z) && _Walkable[mapData.GetValue(x, z)];
     }
     public void ClearMapData()
     {
         m_data = null;
-        walkable = null;
+        _Walkable = null;
     }
     public void ChangeMapInfos(Vector3Int startPos, sbyte[,] info)
     {
-        MapData.ChangeMapInfos(startPos.x, startPos.z, info);
+        mapData.ChangeMapInfos(startPos.x, startPos.z, info);
     }
     public void SetBuildingInfo(bool isBuilding, Vector3Int position, RectInt rect)
     {
         int startX = position.x - rect.position.x;
         int startZ = position.z - rect.position.y;
 
-        if (startX < 0 || startX + rect.size.x > width || startZ < 0 || startZ + rect.size.y > width) return;
+        if (startX < 0 || startX + rect.size.x > _Width || startZ < 0 || startZ + rect.size.y > _Width) return;
 
-        MapVO mapVO = MapData;
+        MapVO mapVO = mapData;
         for (int i = 0; i < rect.size.x; i++)
         {
             for (int j = 0; j < rect.size.y; j++)
@@ -91,7 +93,7 @@ public class MapVOProxy : Proxy
     {
         int startX = position.x;
         int startY = position.z;
-        MapVO data = MapData;
+        MapVO data = mapData;
 
         for (int i = -radius + 1; i < radius; i++)
         {
@@ -109,12 +111,12 @@ public class MapVOProxy : Proxy
     }
     public Vector3Int ViewPositionToMap(Vector3 veiwPosition)
     {
-        veiwPosition.z = sceneCam.nearClipPlane;      
-        Ray ray = sceneCam.ViewportPointToRay(veiwPosition);
+        veiwPosition.z = _SceneCam.nearClipPlane;      
+        Ray ray = _SceneCam.ViewportPointToRay(veiwPosition);
         float angle = Vector3.Angle(ray.direction, -Vector3.up);
         Vector3 targetPos = ray.GetPoint(Mathf.Abs(ray.origin.y) * Mathf.Tan(angle * Mathf.Deg2Rad));
         targetPos.y = 0;       
-        targetPos = mapParent.worldToLocalMatrix * targetPos;
+        targetPos = _MapParent.worldToLocalMatrix * targetPos;
 
         return new Vector3Int((int)targetPos.x, 0, (int)targetPos.z);
     }
@@ -122,7 +124,7 @@ public class MapVOProxy : Proxy
     {
         int startX = position.x;
         int startY = position.z;
-        MapVO data = MapData;
+        MapVO data = mapData;
 
         for (int i = -radius + 1; i < radius; i++)
         {
@@ -145,7 +147,7 @@ public class MapVOProxy : Proxy
         int startX = position.x;
         int startY = position.z;
         int length = 0;
-        MapVO data = MapData;
+        MapVO data = mapData;
 
         for (int i = -outerRadius + 1; i < outerRadius; i++)
         {
@@ -171,10 +173,10 @@ public class MapVOProxy : Proxy
     {
         Vector3Int result = new Vector3Int();
 
-        startX = (int)(width * startXPrec);
-        endX = (int)(width * endXPrec);
-        startZ = (int)(height * startZPrec);
-        endZ = (int)(height * endZPrec);
+        startX = (int)(_Width * startXPrec);
+        endX = (int)(_Width * endXPrec);
+        startZ = (int)(_Height * startZPrec);
+        endZ = (int)(_Height * endZPrec);
 
         result.x = startX + (endX - startX) / 2;
         result.z = startZ + (endZ - startZ) / 2;

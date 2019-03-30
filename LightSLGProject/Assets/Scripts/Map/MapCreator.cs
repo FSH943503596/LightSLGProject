@@ -24,6 +24,8 @@ public class MapCreator : IMapCreater
     private float totalWeight;
     private float[] tileMaxVals;
 
+    public float[,] originMap;
+
     public MapCreator(BattleMapSystem mapSystem)
     {
         this.mapSystem = mapSystem;
@@ -53,6 +55,7 @@ public class MapCreator : IMapCreater
     public int[,] CreateMap()
     {             
         int[,] maps = new int[width, height];
+        originMap = new float[width, height];
         float xOri = UnityEngine.Random.Range(0, xOriMax);
         float yOri = UnityEngine.Random.Range(0, yOriMax);
         float perlinVal;
@@ -61,6 +64,7 @@ public class MapCreator : IMapCreater
             for (int j = 0; j < height; j++)
             {
                 perlinVal = Mathf.PerlinNoise(xOri + i * scale / width, yOri + j * scale / height);
+                originMap[i, j] = perlinVal;
                 for (int k = tileMaxVals.Length - 1; k >= 0; k--)
                 {
                     if (perlinVal >= tileMaxVals[k])

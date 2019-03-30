@@ -87,7 +87,7 @@ public class BattleMapSystem : IBattleSystem<BattleManager>
     {
         //创建地图
         _Maps = _Creator.CreateMap();
-
+        _MapProxy.hypsometricMap = (_Creator as MapCreator).originMap;
         //检测处理
         _Checker.CheckMap(_Maps);
 
@@ -194,7 +194,7 @@ public class BattleMapSystem : IBattleSystem<BattleManager>
     [Obsolete("作废，没有调用该方法的具体逻辑了")]
     public Vector3 MapPositionToWorld(Vector3 mapPosition)
     {
-        return _MapProxy.LocalToWorldMatrix * mapPosition;
+        return _MapProxy.localToWorldMatrix * mapPosition;
     }
     [Obsolete("作废，没有调用该方法的具体逻辑了")]
     public static Vector3Int ViewPositionToMap(Vector3 veiwPosition, Camera camera, Transform mapParent)

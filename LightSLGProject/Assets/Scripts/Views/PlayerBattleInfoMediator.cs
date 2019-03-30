@@ -37,7 +37,8 @@ public class PlayerBattleInfoMediator : Mediator
             GlobalSetting.Msg_InitPlayerBattleInfoMediator,
             GlobalSetting.Msg_UsersPlayerCreated,
             GlobalSetting.Msg_SetUsersPlayerBattleInfoDirty,
-            GlobalSetting.Msg_EndBattle
+            GlobalSetting.Msg_EndBattle,
+            GlobalSetting.Msg_StartBattle
         };
     }
 
