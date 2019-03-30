@@ -119,21 +119,21 @@ public class BuildingVOProxy : Proxy
                 break;
             case E_Building.FarmLand:
                 var tempFarmLandVO = buildingVO as FarmLandVO;
-                SetFarmLandOriginData(tempFarmLandVO);
+                //SetFarmLandOriginData(tempFarmLandVO);
                 mainBaseVO.grainLimit += tempFarmLandVO.grainLimit;
                 player.grainLimit += tempFarmLandVO.grainLimit;
                 mainBaseVO.grainOutputNum += tempFarmLandVO.grainOutputNum;
                 break;
             case E_Building.GoldMine:
                 var tempGoldMineVO = buildingVO as GoldMineVO;
-                SetGoldMineOriginData(tempGoldMineVO);
+                //SetGoldMineOriginData(tempGoldMineVO);
                 mainBaseVO.goldLimit += tempGoldMineVO.goldLimit;
                 player.goldLimit += tempGoldMineVO.goldLimit;
                 mainBaseVO.goldOutputNum += tempGoldMineVO.goldOutputNum;
                 break;
             case E_Building.MilitaryCamp:
                 var tempMilitaryCampVO = buildingVO as MilitaryCampVO;
-                SetMilitaryCampOriginData(tempMilitaryCampVO);
+                //SetMilitaryCampOriginData(tempMilitaryCampVO);
                 mainBaseVO.soldierNumLimit += tempMilitaryCampVO.soldierNumLimit;
                 player.soldierAmountLimit += tempMilitaryCampVO.soldierNumLimit;
                 mainBaseVO.trainNum += tempMilitaryCampVO.trainNum;
@@ -171,15 +171,6 @@ public class BuildingVOProxy : Proxy
     }
     private void SetMainBaseOriginData(MainBaseVO mainBaseVO)
     {
-        mainBaseVO.rect = new RectInt(GlobalSetting.BUILDING_MAINBASE_OFFSET[0],
-                                          GlobalSetting.BUILDING_MAINBASE_OFFSET[1],
-                                          GlobalSetting.BUILDING_MAINBASE_AREA[0],
-                                          GlobalSetting.BUILDING_MAINBASE_AREA[1]);
-
-        mainBaseVO.goldOutputInterval = GlobalSetting.BUILDING_MAINBASE_GOLD_INTERVAL;
-        mainBaseVO.grainOutputInterval = GlobalSetting.BUILDING_MAINBASE_GRAIN_INTERVAL;
-        mainBaseVO.trainInterval = GlobalSetting.BUILDING_MAINBASE_TRAIN_INTERVAL;
-
         if (mainBaseVO.isMain)
         {
             mainBaseVO.goldOutputNum = GlobalSetting.BUILDING_MAINBASE_GOLD_OUTPUT;

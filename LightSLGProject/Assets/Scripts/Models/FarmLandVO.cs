@@ -8,6 +8,7 @@
 */
 
 using System;
+using UnityEngine;
 
 public class FarmLandVO : IBuildingVO
 {
@@ -17,6 +18,8 @@ public class FarmLandVO : IBuildingVO
     {
         prefabName = "FarmLand";
         _BuildingType = E_Building.FarmLand;
+        SetOriginData();
+
     }
 
     public float grainOutputNum { get => _GrainOutputNum; set => _GrainOutputNum = value; }
@@ -24,5 +27,15 @@ public class FarmLandVO : IBuildingVO
 
     public override ushort createCostGold => GlobalSetting.BUILDING_FARMLAND_CREATE_COST[1];
     public override ushort createCostGrain => GlobalSetting.BUILDING_FARMLAND_CREATE_COST[0];
+
+    private void SetOriginData()
+    {
+        rect = new RectInt(GlobalSetting.BUILDING_FARMLAND_OFFSET[0],
+                                          GlobalSetting.BUILDING_FARMLAND_OFFSET[1],
+                                          GlobalSetting.BUILDING_FARMLAND_AREA[0],
+                                          GlobalSetting.BUILDING_FARMLAND_AREA[1]);
+        grainLimit = GlobalSetting.BUILDING_GOLDMINE_GOLD_LIMIT;
+        grainOutputNum = GlobalSetting.BUILDING_GOLDMINE_OUTPUT;
+    }
 }
 

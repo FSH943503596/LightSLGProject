@@ -85,7 +85,7 @@ public class MapVOProxy : Proxy
         {
             for (int j = 0; j < rect.size.y; j++)
             {
-                mapVO.SetBuilding(i, j, isBuilding);
+                mapVO.SetBuilding(startX + i, startZ + j, isBuilding);
             }
         }
     }

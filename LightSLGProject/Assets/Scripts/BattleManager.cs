@@ -86,7 +86,13 @@ public class BattleManager : IBattleManager
         playerSystem.Release();
         buildingSystem.Release();
         mapSystem.Release();
-       
+
+        inputSystem = null;
+        troopSystem = null;
+        playerSystem = null;
+        buildingSystem = null;
+        mapSystem = null;
+
         PoolManager.Instance.ClearData();     
         System.GC.Collect();
     }

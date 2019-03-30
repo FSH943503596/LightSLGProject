@@ -32,7 +32,7 @@ public class MainBaseVO : IBuildingVO
     private bool _IsMain = false;
     private float _SoldierNum = 0;
     private int _SoldierNumLimit = 0;
-    private float _TrainInterval= 999999;
+    private float _TrainInterval = 999999;
     private float _TrainNum = 0;
 
     private float _GrainOutputNum = 0;
@@ -52,10 +52,11 @@ public class MainBaseVO : IBuildingVO
 
     public MainBaseVO()
     {
-        _Rect = new RectInt(0,0,1,1);
         prefabName = "MainBase";
         _BuildingType = E_Building.MainBase;
+        SetOriginData();
         _OwnBuildings.Add(this);
+       
     }
 
     public MainBaseVO(PlayerVO ower) : this()
@@ -71,7 +72,7 @@ public class MainBaseVO : IBuildingVO
     public int radius { get => _Radius; set => _Radius = value; }
     public Vector3Int startTilePositonInMap => _TilePositon - new Vector3Int(_Radius - 1, 0, _Radius - 1);
     public bool isMain { get => _IsMain; set => _IsMain = value; }
-    public List<IBuildingVO> ownBuildings  => _OwnBuildings; 
+    public List<IBuildingVO> ownBuildings => _OwnBuildings;
     public PlayerVO ower => _Ower;
     public override ushort createCostGold => GlobalSetting.BUILDING_SUBBASE_CREATE_COST[1];
     public override ushort createCostGrain => GlobalSetting.BUILDING_SUBBASE_CREATE_COST[0];
@@ -109,7 +110,7 @@ public class MainBaseVO : IBuildingVO
 
     private void IncreateLimit(IBuildingVO building)
     {
-        
+
     }
 
     public bool IsIn(Vector3Int pos)
@@ -132,5 +133,17 @@ public class MainBaseVO : IBuildingVO
         }
 
         ower.AddMainBases(this);
+    }
+
+    private void SetOriginData()
+    {
+        rect = new RectInt(GlobalSetting.BUILDING_MAINBASE_OFFSET[0],
+                                          GlobalSetting.BUILDING_MAINBASE_OFFSET[1],
+                                          GlobalSetting.BUILDING_MAINBASE_AREA[0],
+                                          GlobalSetting.BUILDING_MAINBASE_AREA[1]);
+
+        goldOutputInterval = GlobalSetting.BUILDING_MAINBASE_GOLD_INTERVAL;
+        grainOutputInterval = GlobalSetting.BUILDING_MAINBASE_GRAIN_INTERVAL;
+        trainInterval = GlobalSetting.BUILDING_MAINBASE_TRAIN_INTERVAL;
     }
 }
