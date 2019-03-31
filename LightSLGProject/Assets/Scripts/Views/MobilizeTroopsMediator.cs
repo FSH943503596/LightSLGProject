@@ -21,6 +21,7 @@ public class MobilizeTroopsMediator : Mediator
 
     private MainBaseVO _OriginMainBaseVO = null;
     private MainBaseVO _TargetMainBaseVO = null;
+    private int _TroopSoldiers = 0;
 
     protected MobilizeTroopsInfoUIForm _UIForm => base.m_viewComponent as MobilizeTroopsInfoUIForm;
 
@@ -59,11 +60,13 @@ public class MobilizeTroopsMediator : Mediator
                     if (vO.ower.IsUser && _OriginMainBaseVO == null)
                     {
                         _OriginMainBaseVO = vO;
-                        _UIForm.SetOriginInfo(vO.tilePositon, vO.soldierNum / 2);
+                        _TroopSoldiers = vO.soldierNum / 2;
+                        _UIForm.SetOriginInfo(vO.tilePositon, _TroopSoldiers);
                     }
                     else if ( _OriginMainBaseVO != null && vO.Equals(_OriginMainBaseVO))
                     {
-                        return;
+                        _TroopSoldiers = vO.soldierNum / 2;
+                        _UIForm.SetOriginInfo(vO.tilePositon, _TroopSoldiers);
                     }
                     else
                     {
@@ -75,7 +78,7 @@ public class MobilizeTroopsMediator : Mediator
                     if (_OriginMainBaseVO != null && _TargetMainBaseVO != null)
                     {
                         var threeCmdParams = TreeMsgParamsPool<MainBaseVO, MainBaseVO, int>.Instance.Pop();
-                        threeCmdParams.InitParams(_OriginMainBaseVO, _TargetMainBaseVO, _OriginMainBaseVO.soldierNum / 2);
+                        threeCmdParams.InitParams(_OriginMainBaseVO, _TargetMainBaseVO, _TroopSoldiers);
                         SendNotification(GlobalSetting.Cmd_MoveTroops, threeCmdParams);
 
                         _OriginMainBaseVO = null;
