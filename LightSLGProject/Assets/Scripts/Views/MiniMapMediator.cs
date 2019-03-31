@@ -15,21 +15,11 @@ public class MiniMapMediator : Mediator
     private MiniMapUIForm _MiniMapUIForm;
     private float[,] _MapData;
     private MainBaseVO _MainBaseVO;
+    private Vector3Int _MainBasePosition;
 
     private int _MapWidth = 100;
     private int _MapHeight = 100;
-    /// <summary>
-    /// 用于柏林噪声的X采样偏移量（仿伪随机）
-    /// </summary>
-    private float _XOrg = .0f;
-    /// <summary>
-    /// 用于柏林噪声的Y采样偏移量（仿伪随机）
-    /// </summary>
-    private float _YOrg = .0f;
-    /// <summary>
-    /// 柏林噪声的缩放值（值越大，柏林噪声计算越密集）
-    /// </summary>
-    private float _Scale = 4f;
+
     /// <summary>
     /// 地块大小
     /// </summary>
@@ -46,6 +36,8 @@ public class MiniMapMediator : Mediator
     /// 方块的材质
     /// </summary>
     //private MeshRenderer meshRend;
+
+    private Dictionary<GameObject, MainBaseVO> _Dic_MainBaseVO = new Dictionary<GameObject, MainBaseVO>();
 
     public void InitMiniMapMediator()
     {
@@ -66,10 +58,11 @@ public class MiniMapMediator : Mediator
         {
             GlobalSetting.Msg_InitMiniMapMediator,
             GlobalSetting.Msg_UpdateMainBase,
+            GlobalSetting.Msg_MainbaseCreateComplete,
             GlobalSetting.Msg_MapCreateComplete,
         };
     }
-
+    int name;
     public override void HandleNotification(INotification notification)
     {
         Debug.Log("进入Mediator，处理消息");
@@ -84,9 +77,17 @@ public class MiniMapMediator : Mediator
 
                 break;
             case GlobalSetting.Msg_UpdateMainBase:
-                _MainBaseVO = notification.Body as MainBaseVO;
                 Debug.Log("进入Mediator，处理消息 Msg_UpdateMainBase");
 
+                break;
+            case GlobalSetting.Msg_MainbaseCreateComplete:
+                Debug.Log("进入Mediator，处理消息 Msg_MainbaseCreateComplete");
+                _MainBaseVO = notification.Body as MainBaseVO;
+                var _MainBaseGo = _MiniMapUIForm.CreateMainBase();
+                _MainBaseGo.name = (name++).ToString();
+                //_MainBaseGo.AddComponent<MainBaseDrawEvent>();
+                _MainBaseGo.GetComponent<RectTransform>().anchoredPosition = new Vector2(_MainBaseVO.tilePositon.x * _Scale - _MapWidth * _Scale / 2, _MainBaseVO.tilePositon.z * _Scale - _MapHeight * _Scale / 2);
+                _Dic_MainBaseVO.Add(_MainBaseGo, _MainBaseVO);
                 break;
             case GlobalSetting.Msg_MapCreateComplete:
                 Debug.Log("进入Mediator，处理消息 Msg_MapCreateComplete");
@@ -99,6 +100,13 @@ public class MiniMapMediator : Mediator
         }
     }
 
+    private void OnClick_MainBaseMoveTroops(GameObject go)
+    {
+        MainBaseVO _MainBase = null;
+        _Dic_MainBaseVO.TryGetValue(go, out _MainBase);
+
+    }
+
     private bool IsDisplayMap = false;
     private void OnClick_OpenMap()
     {
@@ -108,13 +116,13 @@ public class MiniMapMediator : Mediator
         FillMapData();
 
     }
-    int max = 4;
+    int _Scale = 4;
     private void FillMapData()
     {
         Debug.Log("进入Mediator，填充地图数据");
 
-        _MapWidth = _MapData.GetLength(0) * max;
-        _MapHeight = _MapData.GetLength(1) * max;
+        _MapWidth = _MapData.GetLength(0) * _Scale;
+        _MapHeight = _MapData.GetLength(1) * _Scale;
 
         //meshRend = GetComponent<MeshRenderer>();
         _NoiseTex = new Texture2D(_MapWidth, _MapHeight);
@@ -131,12 +139,6 @@ public class MiniMapMediator : Mediator
 
         FillPlotData();
     }
-
-    //private void Update()
-    //{
-    //    // 计算柏林噪声
-    //    CalcNoise();
-    //}
 
     /// <summary>
     /// 填充地块数据
@@ -165,7 +167,7 @@ public class MiniMapMediator : Mediator
                 Color color = Color.white;
 
 
-                if (x % max == 0 && x != 0)
+                if (x % _Scale == 0 && x != 0)
                 {
                     max_x++;
                 }
@@ -208,7 +210,7 @@ public class MiniMapMediator : Mediator
                 x++;
 
             }
-            if (y % max == 0 && y != 0)
+            if (y % _Scale == 0 && y != 0)
             {
                 max_y++;
             }
