@@ -29,6 +29,8 @@ public class MainMediator : Mediator
             mainUIForm.TglNormal.onValueChanged.AddListener(p => { if (p) SelectMapSize(GlobalSetting.MAP_NORMAL_LENGTH); });
             mainUIForm.TglBig.onValueChanged.AddListener(p => { if (p) SelectMapSize(GlobalSetting.MAP_BIG_LENGTH); });
             mainUIForm.TglHuge.onValueChanged.AddListener(p => { if (p) SelectMapSize(GlobalSetting.MAP_HUGE_LENGTH); });
+
+
         }
     }
 

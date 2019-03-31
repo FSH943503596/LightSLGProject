@@ -315,6 +315,7 @@ public static class GlobalSetting
     public const string Cmd_UpdateMainBase = "Cmd_UpdateMainBase";
     public const string Cmd_MainBaseChangeOwer = "Cmd_PlayerFaild";
 
+
     //MVC Msg
     public const string Msg_InitConstructionMediator = "Msg_InitConstructionMediator";
     public const string Msg_InitLoginMediator = "Msg_InitLoginMediator";
@@ -351,7 +352,12 @@ public static class GlobalSetting
     public const string UI_PlayerBattleInfoUIForm = "PlayerBattleInfoUIForm";       //玩家战斗信息
     public const string UI_ErrorStringTipsUIForm = "ErrorStringTipsUIForm";         //错误信息弹窗
     public const string UI_VictoryUIForm = "VictoryUIForm";                         //胜利界面
-    public const string UI_FailedUIForm = "FailedUIForm";                           //失败界面
+    public const string UI_FailedUIForm = "FailedUIForm"; 
+    public const string UI_MiniMapUIForm = "MiniMapUIForm";
+
+
+    //失败界面
+    //失败界面
     #endregion
 
     //初始化参数

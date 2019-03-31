@@ -1,30 +1,51 @@
 ﻿{
 "ConfigInfo":
-[
-{"Key":"本配置文件说明"},
+  [
+    { "Key": "本配置文件说明" },
 
-{"Key":"ConstructionUIForm",
-"Value":"UI\\ConstructionUIForm"},
+    {
+      "Key": "ConstructionUIForm",
+      "Value": "UI\\ConstructionUIForm"
+    },
 
-{"Key":"LoginUIForm",
-"Value":"UI\\LoginUIForm"},
+    {
+      "Key": "LoginUIForm",
+      "Value": "UI\\LoginUIForm"
+    },
 
-{"Key":"MainUIForm",
-"Value":"UI\\MainUIForm"},
+    {
+      "Key": "MainUIForm",
+      "Value": "UI\\MainUIForm"
+    },
 
-{"Key":"MobilizeTroopsInfoUIForm",
-"Value":"UI\\MobilizeTroopsInfoUIForm"},
+    {
+      "Key": "MobilizeTroopsInfoUIForm",
+      "Value": "UI\\MobilizeTroopsInfoUIForm"
+    },
 
-{"Key":"PlayerBattleInfoUIForm",
-"Value":"UI\\PlayerBattleInfoUIForm"},
+    {
+      "Key": "PlayerBattleInfoUIForm",
+      "Value": "UI\\PlayerBattleInfoUIForm"
+    },
 
-{"Key":"ErrorStringTipsUIForm",
-"Value":"UI\\ErrorStringTipsUIForm"},
+    {
+      "Key": "ErrorStringTipsUIForm",
+      "Value": "UI\\ErrorStringTipsUIForm"
+    },
 
-{"Key":"VictoryUIForm",
-"Value":"UI\\VictoryUIForm"},
+    {
+      "Key": "VictoryUIForm",
+      "Value": "UI\\VictoryUIForm"
+    },
 
-{"Key":"FailedUIForm",
-"Value":"UI\\FailedUIForm"}
-]
+    {
+      "Key": "FailedUIForm",
+      "Value": "UI\\FailedUIForm"
+    },
+
+    {
+      "Key": "MiniMapUIForm",
+      "Value": "UI\\MiniMapUIForm"
+    }
+  ]
 }

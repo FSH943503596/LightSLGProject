@@ -55,6 +55,7 @@ public class LoginMediator : Mediator
     private void OnClick_Login()
     {
         SendNotification(GlobalSetting.Cmd_LoginGame);
+
     }
 }
 

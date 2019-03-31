@@ -37,6 +37,7 @@ public abstract class MainBaseState
             _MainBaseVO.SetOwer(occupiedPlayer);
         }
         _SendMsgAction(GlobalSetting.Cmd_MainBaseChangeOwer, messageParam);
+
     }
     public virtual void Enter(float time)
     {

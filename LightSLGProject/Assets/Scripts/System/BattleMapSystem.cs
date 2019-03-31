@@ -99,6 +99,7 @@ public class BattleMapSystem : IBattleSystem<BattleManager>
     }
     public void PrintMap()
     {
+
         Vector3Int centerPosition = _MapProxy.ViewPositionToMap(new Vector3(0.5f, 0.5f, 0));
 
         showBasePoint = centerPosition - _YDelta * (maxShowY / 2) - _XDelta * (maxShowX / 2);

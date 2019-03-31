@@ -216,7 +216,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _CurrentUIType:
     IsClearStack: 1
-    UIForms_Type: 0
+    UIForms_Type: 2
     UIForms_ShowMode: 0
     UIForm_LucencyType: 0
   _BtnStartBattle: {fileID: 1467605425510456842}

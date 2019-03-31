@@ -75,6 +75,8 @@ public class BattleManager : IBattleManager
         //初始化面板
         UIManager.Instance.ShowUIForms(GlobalSetting.UI_MobilizeTroopsInfoUIForm);
         UIManager.Instance.CloseUIForms(GlobalSetting.UI_MobilizeTroopsInfoUIForm);
+        UIManager.Instance.ShowUIForms(GlobalSetting.UI_MiniMapUIForm);
+
     }
 
     public void Release()
