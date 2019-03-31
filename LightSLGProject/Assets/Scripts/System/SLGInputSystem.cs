@@ -136,7 +136,6 @@ public class SLGInputSystem :IBattleSystem<BattleManager>
 
         if (current.type == EasyTouch.EvtType.On_Pinch)
         {
-            
             _ChangeViewRect(current.deltaPinch * 10 * Time.deltaTime);
         }
     }

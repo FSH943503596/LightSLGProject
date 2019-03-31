@@ -76,7 +76,7 @@ public class BuildingVOProxy : Proxy
 
         mainBaseVO.ower.grainLimit += data.GrainLimit - currentData.GrainLimit;
         mainBaseVO.ower.goldLimit += data.GoldLimit - currentData.GrainLimit;
-        mainBaseVO.soldierNumLimit += data.SoldierLimit - currentData.SoldierLimit;
+        mainBaseVO.ower.soldierAmountLimit += data.SoldierLimit - currentData.SoldierLimit;
 
         SendNotification(GlobalSetting.Msg_UpdateMainBase, mainBaseVO);
         SendNotification(GlobalSetting.Msg_SetUsersPlayerBattleInfoDirty);
