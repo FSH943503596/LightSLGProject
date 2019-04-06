@@ -84,8 +84,6 @@ public class MiniMapMediator : Mediator
                 Debug.Log("进入Mediator，处理消息 Msg_MainbaseCreateComplete");
                 _MainBaseVO = notification.Body as MainBaseVO;
                 var _MainBaseGo = _MiniMapUIForm.CreateMainBase();
-                _MainBaseGo.name = (name++).ToString();
-                //_MainBaseGo.AddComponent<MainBaseDrawEvent>();
                 _MainBaseGo.GetComponent<RectTransform>().anchoredPosition = new Vector2(_MainBaseVO.tilePositon.x * _Scale - _MapWidth * _Scale / 2, _MainBaseVO.tilePositon.z * _Scale - _MapHeight * _Scale / 2);
                 var sc = _MainBaseGo.GetComponent<MainBaseDrawEvent>();
                 sc.mainBaseVO = _MainBaseVO;
