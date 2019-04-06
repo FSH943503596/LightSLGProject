@@ -24,6 +24,7 @@ public class BattleManager : IBattleManager
     public BattlePlayerSystem playerSystem;
     public SLGInputSystem inputSystem;
     public BattleTroopSystem troopSystem;
+    public BattleAISystem aiSystem;
     public bool isBattleOver { get; set; }
     public int mapWidth => _MapWidth;
     public int mapHeight => _MapHeight;
@@ -42,6 +43,8 @@ public class BattleManager : IBattleManager
         inputSystem.Initialize();
         troopSystem = new BattleTroopSystem(this);
         troopSystem.Initialize();
+        aiSystem = new BattleAISystem(this);
+        aiSystem.Initialize();
 
         //显示初始化战斗面板
         ShowBattleUI();
@@ -76,7 +79,6 @@ public class BattleManager : IBattleManager
         UIManager.Instance.ShowUIForms(GlobalSetting.UI_MobilizeTroopsInfoUIForm);
         UIManager.Instance.CloseUIForms(GlobalSetting.UI_MobilizeTroopsInfoUIForm);
         UIManager.Instance.ShowUIForms(GlobalSetting.UI_MiniMapUIForm);
-
     }
 
     public void Release()

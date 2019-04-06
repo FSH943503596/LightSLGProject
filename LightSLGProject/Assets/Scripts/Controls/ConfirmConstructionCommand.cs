@@ -15,27 +15,24 @@ public class ConfirmConstructionCommand : SimpleCommand
 {
     public override void Execute(INotification notification)
     {
-        IBuildingVO building = notification.Body as IBuildingVO;
+        var msgParam = notification.Body as TwoMsgParams<PlayerVO, IBuildingVO>;
         
-
-        if (building != null)
+        if (msgParam != null && msgParam.first != null && msgParam.second != null)
         {
+            PlayerVO playerVo = msgParam.first;
+            IBuildingVO building = msgParam.second;
             PlayerVOProxy playerVOProxy = Facade.RetrieveProxy(PlayerVOProxy.NAME) as PlayerVOProxy;
-            
             MapVOProxy mapVOProxy = Facade.RetrieveProxy(MapVOProxy.NAME) as MapVOProxy;
-
             BuildingVOProxy buildingProxy = Facade.RetrieveProxy(BuildingVOProxy.NAME) as BuildingVOProxy;
 
-            PlayerVO userVo = playerVOProxy.GetUserVO();
-
             //判断资源是否满足创建需求
-            if (userVo.gold < building.createCostGold || userVo.grain < building.createCostGrain)
+            if (playerVo.gold < building.createCostGold || playerVo.grain < building.createCostGrain)
             {
                 return;
             }
 
-            userVo.gold -= building.createCostGold;
-            userVo.grain -= building.createCostGrain;
+            playerVo.gold -= building.createCostGold;
+            playerVo.grain -= building.createCostGrain;
 
             switch (building.buildingType)
             {
@@ -49,35 +46,33 @@ public class ConfirmConstructionCommand : SimpleCommand
                         if (mapVOProxy.IsCanOccupedArea(mainBaseVO.tilePositon, mainBaseVO.radius))
                         {
 
-                            mainBaseVO.SetOwer(userVo);
-                            buildingProxy.CreateBuilding(mainBaseVO, mainBaseVO, userVo);
-                            //userVo.AddMainBases(building as MainBaseVO);
+                            mainBaseVO.SetOwer(playerVo);
+                            buildingProxy.CreateBuilding(mainBaseVO, mainBaseVO, playerVo);
                             //更新地图建筑信息
                             mapVOProxy.SetBuildingInfo(true, building.tilePositon, building.rect);
                             //更新占领信息
                             mapVOProxy.SetOccupiedInfo(true, building.tilePositon, mainBaseVO.radius);
-                            //buildingProxy.CreateBuilding(mainBaseVO, mainBaseVO, userVo);
-
-                            //mainBaseVO.SetOwer(userVo);
                         }
                     } 
                     break;
                 case E_Building.FarmLand:
                 case E_Building.GoldMine:
                 case E_Building.MilitaryCamp:
-                    MainBaseVO mainBase = playerVOProxy.GetMainBaseUserBuildingBelongTo(building);
+                    MainBaseVO mainBase = playerVOProxy.GetMainBasePlayerBuildingBelongTo(building, playerVo);
                     if (mainBase != null)
                     {
                         //添加建筑
                         mainBase.AddBuilding(building);
                         //更新地图建筑信息
                         mapVOProxy.SetBuildingInfo(true, building.tilePositon, building.rect);
-                        buildingProxy.CreateBuilding(building, mainBase, userVo);
+                        buildingProxy.CreateBuilding(building, mainBase, playerVo);
                     }               
                     break;
                 default:
                     break;
             }
+
+            TwoMsgParamsPool<PlayerVO, IBuildingVO>.Instance.Push(msgParam);
         }
 
         BattleManager.Instance.CancelConstraction();

@@ -64,6 +64,16 @@ public class MapVOProxy : Proxy
     {
         return !mapData.IsBuilding(x, z) && _Walkable[mapData.GetValue(x, z)];
     }
+    /// <summary>
+    /// 格子上是否有建筑
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="z"></param>
+    /// <returns></returns>
+    public bool IsBuilding(int x, int z)
+    {
+        return mapData.IsBuilding(x, z);
+    }
     public void ClearMapData()
     {
         m_data = null;

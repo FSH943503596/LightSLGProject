@@ -159,6 +159,7 @@ ModelImporter:
     100306: TB_Env_Tile_Grass_A02
     100308: Object03
     100310: TB_Env_Tile_Grass_A
+    100312: Group57
     400000: Box06
     400002: //RootNode
     400004: Cylinder07
@@ -315,6 +316,7 @@ ModelImporter:
     400306: TB_Env_Tile_Grass_A02
     400308: Object03
     400310: TB_Env_Tile_Grass_A
+    400312: Group57
     2100000: Standard_1
     2100002: Standard_2
     2100004: Standard_21

@@ -87,6 +87,8 @@ public class MiniMapMediator : Mediator
                 _MainBaseGo.name = (name++).ToString();
                 //_MainBaseGo.AddComponent<MainBaseDrawEvent>();
                 _MainBaseGo.GetComponent<RectTransform>().anchoredPosition = new Vector2(_MainBaseVO.tilePositon.x * _Scale - _MapWidth * _Scale / 2, _MainBaseVO.tilePositon.z * _Scale - _MapHeight * _Scale / 2);
+                var sc = _MainBaseGo.GetComponent<MainBaseDrawEvent>();
+                sc.mainBaseVO = _MainBaseVO;
                 _Dic_MainBaseVO.Add(_MainBaseGo, _MainBaseVO);
                 break;
             case GlobalSetting.Msg_MapCreateComplete:

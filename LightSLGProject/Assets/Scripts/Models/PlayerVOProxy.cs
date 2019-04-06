@@ -15,7 +15,6 @@ using UnityEngine;
 public class PlayerVOProxy : Proxy
 {
     new public const string NAME = "PlayerProxy";
-
     private IList<PlayerVO> _Players
     {
         get
@@ -23,7 +22,6 @@ public class PlayerVOProxy : Proxy
             return base.Data as IList<PlayerVO>;
         }
     }
-
     public PlayerVOProxy() : base(NAME, new List<PlayerVO>())
     {        
     }
@@ -119,16 +117,20 @@ public class PlayerVOProxy : Proxy
     {
         return _Players[0];
     }
+    public PlayerVO GetPlayer(int id)
+    {
+        return _Players[id];
+    }
     /// <summary>
     /// 获取建筑属于玩家的哪个基地，不属于，返回NULL
     /// </summary>
     /// <param name="building"></param>
     /// <returns></returns>
-    public MainBaseVO GetMainBaseUserBuildingBelongTo(IBuildingVO building)
+    public MainBaseVO GetMainBasePlayerBuildingBelongTo(IBuildingVO building, PlayerVO playerVO)
     {
         if (building.buildingType == E_Building.MainBase) return building as MainBaseVO;
 
-        PlayerVO player = GetUserVO();
+        PlayerVO player = playerVO;
         IList<MainBaseVO> mainbases = player.mainBases;
         List<IBuildingVO> buildings = null;
         Vector3Int downLeft;
@@ -176,12 +178,10 @@ public class PlayerVOProxy : Proxy
             }
         }
     }
-
     public void VisitAllUserPlayerMainbase(Action<MainBaseVO> visitor)
     {
         VisitAllPlayerMainBase(GetUserVO(), visitor);
     }
-
     public void VisitAllPlayers(Action<PlayerVO> visitor)
     {
         if (visitor != null)

@@ -127,7 +127,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _CurrentUIType:
     IsClearStack: 0
-    UIForms_Type: 2
+    UIForms_Type: 1
     UIForms_ShowMode: 0
     UIForm_LucencyType: 0
   _BtnOpenMap: {fileID: 7394191047959709888}

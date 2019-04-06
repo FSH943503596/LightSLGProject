@@ -205,7 +205,9 @@ public class ConstructionMediator : Mediator
             //显示建造列表
             ShowBuildingSelectList();
             //发送创建建筑消息 增加建筑信息，取消选中状态
-            SendNotification(GlobalSetting.Cmd_ConfirmConstruction, _Building);
+            var msgParam = TwoMsgParamsPool<PlayerVO, IBuildingVO>.Instance.Pop();
+            msgParam.InitParams(_UserPlayerVO, _Building);
+            SendNotification(GlobalSetting.Cmd_ConfirmConstruction, msgParam);
         }
     }
 
