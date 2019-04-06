@@ -18,6 +18,10 @@ public class BattleTroopSystem : IBattleSystem<BattleManager>
     private List<Troop> _WaitTroops = new List<Troop>();
     private int _CreateCountPerFrame = 5;
     private BuildingVOProxy _BuildingProxy;
+    private MapSoldierInfo _WaitForUseMapSoldierInfos = null;
+    private MapSoldierInfo _WatiForUseMapSoldierInfoLast = null;
+    private MapSoldierInfo _CurrentUsedMapSoldierInfos = null;
+
     public BattleTroopSystem(IBattleManager mgr) : base(mgr)
     {
     }
@@ -55,18 +59,25 @@ public class BattleTroopSystem : IBattleSystem<BattleManager>
                     //士兵到达处理
                     SoldierArrivedHandler(troop, soldier);
                     //TODO 处理占领，失败，胜利
+                    if(troop.soldiers.Count <= 0 && troop.amount <= 0) _WaitTroops.Add(troop); 
                 });
+                troop.soldiers.Add(soldier);
             }    
         }
 
         //移除
-        for (int i = _Troops.Count - 1; i >= 0; i--)
+        for(int i = _Troops.Count - 1; i >= 0; i--)
         {
             if (_Troops[i].amount <= 0)
             {
-                _WaitTroops.Add(_Troops[i]);
                 _Troops.RemoveAt(i);
             }
+        }
+
+        //发送小地图士兵位置信息
+        for (int i = 0; i < _Troops.Count; i++)
+        {
+
         }
     }
 
@@ -75,8 +86,9 @@ public class BattleTroopSystem : IBattleSystem<BattleManager>
         if(!battleManager.isBattleOver)
         {
             _BuildingProxy.ReceiveSoldier(troop.end, troop.starter, UnityEngine.Time.time);
+            troop.soldiers.Remove(soldier);
         }
-        
+
         PoolManager.Instance.HideObjet(soldier);
     }
 
@@ -86,8 +98,10 @@ public class BattleTroopSystem : IBattleSystem<BattleManager>
 
         _WaitTroops.Clear();
         _Troops.Clear();
+        _WaitForUseMapSoldierInfos = null;
+        _CurrentUsedMapSoldierInfos = null;
+        _WatiForUseMapSoldierInfoLast = null;
     }
-
     //创建军队
     public void CreateTroop(MainBaseVO start, MainBaseVO end, int amount)
     {
@@ -97,11 +111,13 @@ public class BattleTroopSystem : IBattleSystem<BattleManager>
             if (_WaitTroops.Count == 0)
             {
                 troop = new Troop();
+                troop.soldiers = new List<GameObject>();
             }
             else
             {
                 troop = _WaitTroops[0];
                 _WaitTroops.RemoveAt(0);
+                troop.soldiers.Clear();
             }
 
             troop.start = start;
@@ -114,12 +130,44 @@ public class BattleTroopSystem : IBattleSystem<BattleManager>
         }
     }
 
+    private MapSoldierInfo GetMapSoldierInfo()
+    {
+        MapSoldierInfo mapSoldierInfo = null;
+        if (_WaitForUseMapSoldierInfos == null)
+        {
+            mapSoldierInfo = new MapSoldierInfo();
+        }
+        else
+        {
+            mapSoldierInfo = _WaitForUseMapSoldierInfos;
+            _WaitForUseMapSoldierInfos = _WaitForUseMapSoldierInfos.nextNode;
+            if(_WaitForUseMapSoldierInfos == null)
+            { 
+
+            }
+        }
+
+        mapSoldierInfo.nextNode = null;
+
+        return mapSoldierInfo;
+    }
+
     private struct Troop
     {
         public MainBaseVO start;
         public PlayerVO starter;
         public MainBaseVO end;
         public int amount;
+        public List<GameObject> soldiers;
     }
+
+
+}
+
+public class MapSoldierInfo
+{
+    public int coloerIndex;
+    public Vector3 position;
+    public MapSoldierInfo nextNode;
 }
 
