@@ -101,31 +101,23 @@ public class BattleTroopSystem : IBattleSystem<BattleManager>
         }
 
         _CurrentUsedMapSoldierInfos.nextNode = null;
-        MapSoldierInfo nextNode = null;
+        MapSoldierInfo nextNode = _CurrentUsedMapSoldierInfos;
         //发送小地图士兵位置信息
         for (int i = 0; i < _Troops.Count; i++)
         {
             for (int j = 0; j < _Troops[i].soldiers.Count; j++)
             {
-                if(nextNode != null)
-                {
-                    nextNode.nextNode = GetMapSoldierInfo();
-                    nextNode = nextNode.nextNode;
-                }
-                else
-                {
-                    nextNode = GetMapSoldierInfo();
-                    _CurrentUsedMapSoldierInfos = nextNode;
-                }
+                nextNode.nextNode = GetMapSoldierInfo();
+                nextNode = nextNode.nextNode;
 
                 nextNode.coloerIndex = _Troops[i].starter.colorIndex;
                 nextNode.position = _Troops[i].soldiers[j].transform.localPosition;
             }
         }
 
-        if(_CurrentUsedMapSoldierInfos != null)
+        if(_CurrentUsedMapSoldierInfos.nextNode != null)
         {
-            facade.SendNotification(GlobalSetting.Msg_MapUpdateSoldiersPositon, _CurrentUsedMapSoldierInfos);
+            facade.SendNotification(GlobalSetting.Msg_MapUpdateSoldiersPositon, _CurrentUsedMapSoldierInfos.nextNode);
         }
     }
 
