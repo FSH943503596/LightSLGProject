@@ -29,6 +29,7 @@ public class BattleTroopSystem : IBattleSystem<BattleManager>
     {
         _SoldierParent = GameObject.FindGameObjectWithTag(GlobalSetting.TAG_SOLDIERS_PARENT_NAME).transform;
         _BuildingProxy = facade.RetrieveProxy(BuildingVOProxy.NAME) as BuildingVOProxy;
+        _CurrentUsedMapSoldierInfos = new MapSoldierInfo();
     }
     public override void Update()
     {
@@ -74,28 +75,32 @@ public class BattleTroopSystem : IBattleSystem<BattleManager>
             }
         }
 
-        //处理士兵链表
-        if(_CurrentUsedMapSoldierInfos != null)
-        {
-            if (_WaitForUseMapSoldierInfos == null)
+        //回收士兵链表
+        if(_CurrentUsedMapSoldierInfos.nextNode != null)
+        { 
+            if(_WatiForUseMapSoldierInfoLast == null)
             {
-                _WaitForUseMapSoldierInfos = _CurrentUsedMapSoldierInfos;
-                _WatiForUseMapSoldierInfoLast = _CurrentUsedMapSoldierInfos;
+                _WatiForUseMapSoldierInfoLast = _CurrentUsedMapSoldierInfos.nextNode;
             }
             else
             {
-                _WatiForUseMapSoldierInfoLast.nextNode = _CurrentUsedMapSoldierInfos;
-                MapSoldierInfo nextSoldior = _CurrentUsedMapSoldierInfos;
-                while (nextSoldior.nextNode != null)
-                {
-                    nextSoldior = nextSoldior.nextNode;
-                }
-                _WatiForUseMapSoldierInfoLast = nextSoldior;
+                _WatiForUseMapSoldierInfoLast.nextNode = _CurrentUsedMapSoldierInfos.nextNode;
+            }
+
+            if(_WaitForUseMapSoldierInfos == null)
+            {
+                _WaitForUseMapSoldierInfos = _WatiForUseMapSoldierInfoLast;
+            }
+
+            if(_WatiForUseMapSoldierInfoLast.nextNode != null)
+            {
+                MapSoldierInfo mapSoldierInfo = _WatiForUseMapSoldierInfoLast;
+                while (mapSoldierInfo.nextNode != null) mapSoldierInfo = mapSoldierInfo.nextNode;
+                _WatiForUseMapSoldierInfoLast = mapSoldierInfo;
             }
         }
 
-
-        _CurrentUsedMapSoldierInfos = null;
+        _CurrentUsedMapSoldierInfos.nextNode = null;
         MapSoldierInfo nextNode = null;
         //发送小地图士兵位置信息
         for (int i = 0; i < _Troops.Count; i++)
