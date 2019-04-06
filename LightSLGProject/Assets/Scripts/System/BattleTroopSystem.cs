@@ -74,10 +74,53 @@ public class BattleTroopSystem : IBattleSystem<BattleManager>
             }
         }
 
+        //处理士兵链表
+        if(_CurrentUsedMapSoldierInfos != null)
+        {
+            if (_WaitForUseMapSoldierInfos == null)
+            {
+                _WaitForUseMapSoldierInfos = _CurrentUsedMapSoldierInfos;
+                _WatiForUseMapSoldierInfoLast = _CurrentUsedMapSoldierInfos;
+            }
+            else
+            {
+                _WatiForUseMapSoldierInfoLast.nextNode = _CurrentUsedMapSoldierInfos;
+                MapSoldierInfo nextSoldior = _CurrentUsedMapSoldierInfos;
+                while (nextSoldior.nextNode != null)
+                {
+                    nextSoldior = nextSoldior.nextNode;
+                }
+                _WatiForUseMapSoldierInfoLast = nextSoldior;
+            }
+        }
+
+
+        _CurrentUsedMapSoldierInfos = null;
+        MapSoldierInfo nextNode = null;
         //发送小地图士兵位置信息
         for (int i = 0; i < _Troops.Count; i++)
         {
+            for (int j = 0; j < _Troops[i].soldiers.Count; j++)
+            {
+                if(nextNode != null)
+                {
+                    nextNode.nextNode = GetMapSoldierInfo();
+                    nextNode = nextNode.nextNode;
+                }
+                else
+                {
+                    nextNode = GetMapSoldierInfo();
+                    _CurrentUsedMapSoldierInfos = nextNode;
+                }
 
+                nextNode.coloerIndex = _Troops[i].starter.colorIndex;
+                nextNode.position = _Troops[i].soldiers[j].transform.localPosition;
+            }
+        }
+
+        if(_CurrentUsedMapSoldierInfos != null)
+        {
+            facade.SendNotification(GlobalSetting.Msg_MapUpdateSoldiersPositon, _CurrentUsedMapSoldierInfos);
         }
     }
 
@@ -142,12 +185,11 @@ public class BattleTroopSystem : IBattleSystem<BattleManager>
             mapSoldierInfo = _WaitForUseMapSoldierInfos;
             _WaitForUseMapSoldierInfos = _WaitForUseMapSoldierInfos.nextNode;
             if(_WaitForUseMapSoldierInfos == null)
-            { 
-
+            {
+                _WatiForUseMapSoldierInfoLast = null;
             }
+            mapSoldierInfo.nextNode = null;
         }
-
-        mapSoldierInfo.nextNode = null;
 
         return mapSoldierInfo;
     }
@@ -160,8 +202,6 @@ public class BattleTroopSystem : IBattleSystem<BattleManager>
         public int amount;
         public List<GameObject> soldiers;
     }
-
-
 }
 
 public class MapSoldierInfo
