@@ -339,6 +339,7 @@ public static class GlobalSetting
     public const string Msg_MapCreateComplete = "Msg_MapCreateComplete";
     public const string Msg_MainbaseCreateComplete = "Msg_MainbaseCreateComplete";
     public const string Mst_PlayerGenerateComplete = "Mst_PlayerGenerateComplete";
+    public const string Msg_MapUpdateSoldiersPositon = "Msg_MapUpdateSoldiersPositon";
     
 
 
