@@ -60,6 +60,7 @@ public class MiniMapMediator : Mediator
             GlobalSetting.Msg_UpdateMainBase,
             GlobalSetting.Msg_MainbaseCreateComplete,
             GlobalSetting.Msg_MapCreateComplete,
+            GlobalSetting.Msg_MapUpdateSoldiersPositon,
         };
     }
     int name;
@@ -93,6 +94,10 @@ public class MiniMapMediator : Mediator
                 Debug.Log("进入Mediator，处理消息 Msg_MapCreateComplete");
 
                 _MapData = notification.Body as float[,];
+                break;
+            case GlobalSetting.Msg_MapUpdateSoldiersPositon:
+                Debug.Log("进入Mediator，处理消息 Msg_MapUpdateSoldiersPositon");
+                _MiniMapUIForm.CreateTroops(notification.Body as MapSoldierInfo);
 
                 break;
             default:

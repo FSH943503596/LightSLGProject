@@ -1319,11 +1319,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: MiniMapUIForm
       objectReference: {fileID: 0}
-    - target: {fileID: 2114204225611153858, guid: c61cbb205f48a4b41b85468d347d420c,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 5243590858581269075, guid: c61cbb205f48a4b41b85468d347d420c,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1428,11 +1423,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 1175006331127349655, guid: c61cbb205f48a4b41b85468d347d420c,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c61cbb205f48a4b41b85468d347d420c, type: 3}

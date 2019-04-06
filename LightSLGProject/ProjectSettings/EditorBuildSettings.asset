@@ -20,4 +20,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Battle.unity
     guid: 40770ac8c0cf7864ead60e1bc3dd2d40
+  - enabled: 1
+    path: Assets/Z-Test/UITest.unity
+    guid: 97a2da04f9997864e81c9194e98ac92a
   m_configObjects: {}
