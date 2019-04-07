@@ -114,9 +114,12 @@ public class MiniMapMediator : Mediator
     MapSoldierInfo _MapSoldierInfo;
     private void FillTroopsData()
     {
-        int index = -1;
         _SoldierList.ForEach(p => p.SetActive(false));
-        _SoldierList.Clear();
+        if (_MapSoldierInfo == null)
+        {
+            return;
+        }
+        int index = -1;
         var nextNode = _MapSoldierInfo;
         Debug.Log("nextNode.position £º" + nextNode.position);
         while (nextNode != null)
