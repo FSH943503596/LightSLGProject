@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MiniMapMediator : Mediator
 {
@@ -38,6 +39,9 @@ public class MiniMapMediator : Mediator
     //private MeshRenderer meshRend;
 
     private Dictionary<GameObject, MainBaseVO> _Dic_MainBaseVO = new Dictionary<GameObject, MainBaseVO>();
+    private List<GameObject> _SoldierList = new List<GameObject>();
+
+
 
     public void InitMiniMapMediator()
     {
@@ -85,7 +89,8 @@ public class MiniMapMediator : Mediator
                 Debug.Log("进入Mediator，处理消息 Msg_MainbaseCreateComplete");
                 _MainBaseVO = notification.Body as MainBaseVO;
                 var _MainBaseGo = _MiniMapUIForm.CreateMainBase();
-                _MainBaseGo.GetComponent<RectTransform>().anchoredPosition = new Vector2(_MainBaseVO.tilePositon.x * _Scale - _MapWidth * _Scale / 2, _MainBaseVO.tilePositon.z * _Scale - _MapHeight * _Scale / 2);
+                var _TilePositon = Position(_MainBaseVO.tilePositon);
+                _MainBaseGo.GetComponent<RectTransform>().anchoredPosition = new Vector2(_TilePositon.x, _TilePositon.y);
                 var sc = _MainBaseGo.GetComponent<MainBaseDrawEvent>();
                 sc.mainBaseVO = _MainBaseVO;
                 _Dic_MainBaseVO.Add(_MainBaseGo, _MainBaseVO);
@@ -97,12 +102,47 @@ public class MiniMapMediator : Mediator
                 break;
             case GlobalSetting.Msg_MapUpdateSoldiersPositon:
                 Debug.Log("进入Mediator，处理消息 Msg_MapUpdateSoldiersPositon");
-                _MiniMapUIForm.CreateTroops(notification.Body as MapSoldierInfo);
-
+                _MapSoldierInfo = notification.Body as MapSoldierInfo;
+                FillTroopsData();
                 break;
             default:
                 break;
         }
+    }
+    MapSoldierInfo _MapSoldierInfo;
+    private void FillTroopsData()
+    {
+        int index = -1;
+        _SoldierList.ForEach(p => p.SetActive(false));
+
+        var nextNode = _MapSoldierInfo;
+        Debug.Log("nextNode.position ：" + nextNode.position);
+        while (nextNode != null)
+        {
+            if (++index < _SoldierList.Count)
+            {
+                _SoldierList[index].SetActive(true);
+                _SoldierList[index].transform.localPosition = //Position(nextNode.position);
+                new Vector3(nextNode.position.x, nextNode.position.z, 0);
+                _SoldierList[index].GetComponent<Image>().color = GlobalSetting.PLAYER_COLOR_LIST[nextNode.coloerIndex];
+            }
+            else
+            {
+                var go = _MiniMapUIForm.CreateSoldier();
+                go.transform.localPosition = //Position(nextNode.position);
+                new Vector3(nextNode.position.x, nextNode.position.z, 0);
+                
+                go.GetComponent<Image>().color = GlobalSetting.PLAYER_COLOR_LIST[nextNode.coloerIndex];
+                _SoldierList.Add(go);
+            }
+            nextNode = nextNode.nextNode;
+        }
+    }
+
+    private Vector3 Position(Vector3 pos)
+    {
+        return new Vector3(pos.x * _Scale - _MapWidth * _Scale / 2, pos.z * _Scale - _MapHeight * _Scale / 2,0);
+        //new Vector2(_MainBaseVO.tilePositon.x * _Scale - _MapWidth * _Scale / 2, _MainBaseVO.tilePositon.z * _Scale - _MapHeight * _Scale / 2);
     }
 
     private void OnClick_MainBaseMoveTroops(GameObject go)
@@ -117,9 +157,12 @@ public class MiniMapMediator : Mediator
     {
         Debug.Log("进入Mediator，点击按钮事件触发");
         IsDisplayMap = !IsDisplayMap;
+        if (IsDisplayMap == false)
+        {
+            _SoldierList.ForEach(p=> GameObject.Destroy(p));
+        }
         _MiniMapUIForm.imgMap.gameObject.SetActive(IsDisplayMap);
         FillMapData();
-
     }
     int _Scale = 4;
     private void FillMapData()
