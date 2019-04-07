@@ -159,7 +159,8 @@ public class MiniMapMediator : Mediator
         IsDisplayMap = !IsDisplayMap;
         if (IsDisplayMap == false)
         {
-            _SoldierList.ForEach(p=> GameObject.Destroy(p));
+            //_SoldierList.ForEach(p=> GameObject.Destroy(p));
+            _SoldierList.ForEach(p => p.SetActive(false));
         }
         _MiniMapUIForm.imgMap.gameObject.SetActive(IsDisplayMap);
         FillMapData();
