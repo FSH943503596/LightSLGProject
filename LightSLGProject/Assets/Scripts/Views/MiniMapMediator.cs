@@ -20,7 +20,7 @@ public class MiniMapMediator : Mediator
 
     private int _MapWidth = 100;
     private int _MapHeight = 100;
-
+    private int _Scale = 4;
     /// <summary>
     /// 地块大小
     /// </summary>
@@ -99,6 +99,8 @@ public class MiniMapMediator : Mediator
                 Debug.Log("进入Mediator，处理消息 Msg_MapCreateComplete");
 
                 _MapData = notification.Body as float[,];
+                _MapWidth = _MapData.GetLength(0) * _Scale;
+                _MapHeight = _MapData.GetLength(1) * _Scale;
                 break;
             case GlobalSetting.Msg_MapUpdateSoldiersPositon:
                 Debug.Log("进入Mediator，处理消息 Msg_MapUpdateSoldiersPositon");
@@ -114,7 +116,7 @@ public class MiniMapMediator : Mediator
     {
         int index = -1;
         _SoldierList.ForEach(p => p.SetActive(false));
-
+        _SoldierList.Clear();
         var nextNode = _MapSoldierInfo;
         Debug.Log("nextNode.position ：" + nextNode.position);
         while (nextNode != null)
@@ -122,27 +124,22 @@ public class MiniMapMediator : Mediator
             if (++index < _SoldierList.Count)
             {
                 _SoldierList[index].SetActive(true);
-                _SoldierList[index].transform.localPosition = //Position(nextNode.position);
-                new Vector3(nextNode.position.x, nextNode.position.z, 0);
+                _SoldierList[index].GetComponent<RectTransform>().anchoredPosition = Position(nextNode.position);
                 _SoldierList[index].GetComponent<Image>().color = GlobalSetting.PLAYER_COLOR_LIST[nextNode.coloerIndex];
             }
             else
             {
                 var go = _MiniMapUIForm.CreateSoldier();
-                go.transform.localPosition = //Position(nextNode.position);
-                new Vector3(nextNode.position.x, nextNode.position.z, 0);
-                
+                go.GetComponent<RectTransform>().anchoredPosition = Position(nextNode.position);
                 go.GetComponent<Image>().color = GlobalSetting.PLAYER_COLOR_LIST[nextNode.coloerIndex];
                 _SoldierList.Add(go);
             }
             nextNode = nextNode.nextNode;
         }
     }
-
     private Vector3 Position(Vector3 pos)
     {
-        return new Vector3(pos.x * _Scale - _MapWidth * _Scale / 2, pos.z * _Scale - _MapHeight * _Scale / 2,0);
-        //new Vector2(_MainBaseVO.tilePositon.x * _Scale - _MapWidth * _Scale / 2, _MainBaseVO.tilePositon.z * _Scale - _MapHeight * _Scale / 2);
+        return new Vector3(pos.x * _Scale - _MapWidth  / 2, pos.z * _Scale - _MapHeight  / 2,0);
     }
 
     private void OnClick_MainBaseMoveTroops(GameObject go)
@@ -164,13 +161,10 @@ public class MiniMapMediator : Mediator
         _MiniMapUIForm.imgMap.gameObject.SetActive(IsDisplayMap);
         FillMapData();
     }
-    int _Scale = 4;
+
     private void FillMapData()
     {
-        Debug.Log("进入Mediator，填充地图数据");
-
-        _MapWidth = _MapData.GetLength(0) * _Scale;
-        _MapHeight = _MapData.GetLength(1) * _Scale;
+        Debug.Log("进入Mediator，填充地图数据");       
 
         //meshRend = GetComponent<MeshRenderer>();
         _NoiseTex = new Texture2D(_MapWidth, _MapHeight);
@@ -179,7 +173,7 @@ public class MiniMapMediator : Mediator
         // 将生成的柏林噪声图赋值给方块的材质
         //meshRend.material.mainTexture = noiseTex;
 
-        _MiniMapUIForm.imgMap.GetComponent<RectTransform>().sizeDelta = new Vector2(_NoiseTex.width, _NoiseTex.height);
+        _MiniMapUIForm.imgMap.rectTransform.sizeDelta = new Vector2(_NoiseTex.width, _NoiseTex.height);
 
         Sprite sp = Sprite.Create(_NoiseTex, new Rect(0, 0, _NoiseTex.width, _NoiseTex.height), new Vector2(0.5f, 0.5f));
 

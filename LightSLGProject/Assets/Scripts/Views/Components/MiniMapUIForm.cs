@@ -26,6 +26,7 @@ public class MiniMapUIForm : BaseUIForm
         var go = Instantiate(_MainBase);
         go.transform.parent = _MainBase.transform.parent;
         go.transform.localScale = Vector3.one;
+        go.transform.rotation = _MainBase.transform.parent.rotation;
         go.SetActive(true);
 
         Debug.Log("创建主城");
@@ -37,6 +38,7 @@ public class MiniMapUIForm : BaseUIForm
         var go = Instantiate(_Soldier);
         go.transform.parent = _Soldier.transform.parent;
         go.transform.localScale = Vector3.one;
+        go.transform.rotation = _Soldier.transform.parent.rotation;
         go.SetActive(true);
 
         Debug.Log("创建兵");
