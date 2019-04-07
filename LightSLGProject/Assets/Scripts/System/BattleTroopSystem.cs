@@ -21,6 +21,7 @@ public class BattleTroopSystem : IBattleSystem<BattleManager>
     private MapSoldierInfo _WaitForUseMapSoldierInfos = null;
     private MapSoldierInfo _WatiForUseMapSoldierInfoLast = null;
     private MapSoldierInfo _CurrentUsedMapSoldierInfos = null;
+    private bool _IsNotClearSoldiers = false;
 
     public BattleTroopSystem(IBattleManager mgr) : base(mgr)
     {
@@ -33,6 +34,17 @@ public class BattleTroopSystem : IBattleSystem<BattleManager>
     }
     public override void Update()
     {
+        if(_Troops.Count <= 0)
+        {
+            if (_IsNotClearSoldiers)
+            {
+                facade.SendNotification(GlobalSetting.Msg_MapUpdateSoldiersPositon, null);
+                _IsNotClearSoldiers = false;
+            }
+            return;
+        }
+
+        _IsNotClearSoldiers = true;
         if (battleManager.isBattleOver) return;
         int total;
         AStarPathFindingAgent agent;
@@ -40,7 +52,9 @@ public class BattleTroopSystem : IBattleSystem<BattleManager>
         //出兵
         for (int i = 0; i < _Troops.Count; i++)
         {
+
             Troop troop = _Troops[i];
+            if (troop.amount <= 0) continue;
             total = troop.start.soldierNum - _CreateCountPerFrame < 0 ? troop.start.soldierNum : _CreateCountPerFrame;
             total = troop.amount > total ? total : troop.amount;
             troop.start.soldierNum -= total;
@@ -60,7 +74,7 @@ public class BattleTroopSystem : IBattleSystem<BattleManager>
                     //士兵到达处理
                     SoldierArrivedHandler(troop, soldier);
                     //TODO 处理占领，失败，胜利
-                    if(troop.soldiers.Count <= 0 && troop.amount <= 0) _WaitTroops.Add(troop); 
+                    //if(troop.soldiers.Count <= 0 && troop.amount <= 0) _WaitTroops.Add(troop); 
                 });
                 troop.soldiers.Add(soldier);
             }    
@@ -69,8 +83,9 @@ public class BattleTroopSystem : IBattleSystem<BattleManager>
         //移除
         for(int i = _Troops.Count - 1; i >= 0; i--)
         {
-            if (_Troops[i].amount <= 0)
+            if (_Troops[i].amount <= 0 && _Troops[i].soldiers.Count <= 0)
             {
+                _WaitTroops.Add(_Troops[i]);
                 _Troops.RemoveAt(i);
             }
         }
@@ -115,8 +130,9 @@ public class BattleTroopSystem : IBattleSystem<BattleManager>
             }
         }
 
-        if(_CurrentUsedMapSoldierInfos.nextNode != null)
+        if (_CurrentUsedMapSoldierInfos.nextNode != null)
         {
+           
             facade.SendNotification(GlobalSetting.Msg_MapUpdateSoldiersPositon, _CurrentUsedMapSoldierInfos.nextNode);
         }
     }
